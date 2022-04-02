@@ -10,8 +10,10 @@ class AddPlayerScreen extends StatefulWidget {
 class _AddPlayerScreenState extends State<AddPlayerScreen> {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(),
+    return const SafeArea(
+      child: Text(
+        'Index 0: Add',
+      ),
     );
   }
 }
