@@ -30,6 +30,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           TextField(
             controller: firstNameController,
