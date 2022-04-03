@@ -9,19 +9,22 @@ class ViewPlayerScreen extends StatefulWidget {
 }
 
 class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
-
   List<Player> playerList = [
     Player(
-        firstName: 'Onika',
-        lastName: 'Käse',
-        birthday: DateTime(1999)),
+      firstName: 'Onika',
+      lastName: 'Käse',
+      birthday: DateTime(1999),
+      playerID: 123124,
+    ),
     Player(
-        firstName: 'Tay',
-        lastName: 'Lor',
-        birthday: DateTime(2000)),
+      firstName: 'Tay',
+      lastName: 'Lor',
+      birthday: DateTime(2000),
+      playerID: 20137,
+    ),
   ];
 
-  List<Widget> _buildList (){
+  List<Widget> _buildList() {
     List<ListTile> listTiles = [];
     for (Player player in playerList) {
       listTiles.add(ListTile(
@@ -36,8 +39,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Column(
-        children:
-          _buildList(),
+        children: _buildList(),
       ),
     );
   }

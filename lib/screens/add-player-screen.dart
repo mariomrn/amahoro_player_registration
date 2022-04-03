@@ -49,7 +49,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
             },
           ),
           Text(selectedDate.toIso8601String()),
-          Player(firstName: 'Kimi', lastName: 'sagara', birthday: DateTime(2000),),
+          Player(firstName: 'Kimi', lastName: 'sagara', birthday: DateTime(2000), playerID: 912837,),
           TextButton(
             child: const Text('Press me'),
             onPressed: () {

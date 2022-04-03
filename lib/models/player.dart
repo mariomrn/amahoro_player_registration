@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 
 class Player extends StatelessWidget{
 
-  Player({required this.firstName, required this.lastName, required this.birthday});
+  Player({required this.firstName, required this.lastName, required this.birthday, required this.playerID});
 
   String firstName;
   String lastName;
   DateTime birthday;
+  int playerID;
 
   @override
   Widget build(BuildContext context) {
