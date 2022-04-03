@@ -1,5 +1,7 @@
 import 'package:amahoro_player_registration/screens/add-player-screen.dart';
 import 'package:amahoro_player_registration/screens/view-player-screen.dart';
+import 'package:amahoro_player_registration/theme/colors.dart';
+import 'package:amahoro_player_registration/theme/textStyles.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -51,6 +53,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   int _selectedIndex = 0;
 
+  List<String> titles = ['Add Player', 'View Player'];
+
   static const List<Widget> _screens = <Widget>[
     AddPlayerScreen(),
     ViewPlayerScreen(),
@@ -65,13 +69,16 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(titles[_selectedIndex], style: kDefaultTextStyle.copyWith(color: Colors.white),),
       ),
       body: Center(
         child: _screens.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        selectedLabelStyle: kDefaultTextStyle11pt,
+        unselectedLabelStyle: kDefaultTextStyle11pt,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.add),
@@ -83,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
+        selectedItemColor: kAmahoroColor,
         onTap: _onItemTapped,
       ),
     );

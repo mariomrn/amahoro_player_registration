@@ -8,3 +8,6 @@ TextStyle kTitleTextStyle = GoogleFonts.inter(
 TextStyle kDefaultTextStyle = GoogleFonts.inter(
   textStyle: TextStyle(color: kAmahoroColor),
 );
+TextStyle kDefaultTextStyle11pt = GoogleFonts.inter(
+  textStyle: TextStyle(fontSize: 11, color: kAmahoroColor),
+);
