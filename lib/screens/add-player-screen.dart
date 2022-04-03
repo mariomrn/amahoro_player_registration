@@ -1,4 +1,3 @@
-import 'package:amahoro_player_registration/models/player.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -49,23 +48,31 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
             },
           ),
           Text(selectedDate.toIso8601String()),
-          Player(firstName: 'Kimi', lastName: 'sagara', birthday: DateTime(2000), playerID: 912837,),
           TextButton(
             child: const Text('Press me'),
             onPressed: () {
-              // Player p0 = Player(
-              //   firstName: firstNameController.text,
-              //   lastName: lastNameController.text,
-              //   birthday: DateTime(2019),
-              //   id: 1737168,
-              // );
-              //TODO: Hier muss der erzeugte Spieler in die Datenbank gespielt werden
+              addPlayer();
               firstNameController.clear();
               lastNameController.clear();
+              selectedDate = DateTime.now();
             },
           ),
         ],
       ),
     );
   }
+
+  Future<void> addPlayer() {
+    CollectionReference players = FirebaseFirestore.instance.collection('player');
+    // Call the user's CollectionReference to add a new user
+    return players
+        .add({
+      'firstName': firstNameController.text, // John Doe
+      'lastName': lastNameController.text, // Stokes and Sons
+      'birthday': selectedDate // 42
+    })
+        .then((value) => print("Player Added"))
+        .catchError((error) => print("Failed to add user: $error"));
+  }
+
 }
