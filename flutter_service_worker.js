@@ -6,18 +6,22 @@ const RESOURCES = {
   "assets/FontManifest.json": "dc3d03800ccca4601324923c0b1d6d57",
 "assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "6d342eb68f170c97609e9da345464e5e",
 "assets/AssetManifest.json": "2efbb41d7877d10aac9d091f58ccd7b9",
-"assets/NOTICES": "9e05965335c7c5d1d08696481a6816a2",
-"assets/fonts/MaterialIcons-Regular.otf": "1288c9e28052e028aba623321f7826ac",
-"index.html": "90b0b8e9ed4619c90ad33125bd4bfd58",
-"/": "90b0b8e9ed4619c90ad33125bd4bfd58",
-"version.json": "9133f0a8a1529a10927e3524ad76d076",
+"assets/NOTICES": "8f7d760cf3ab8a11f1c24e84f6839abe",
+"assets/fonts/MaterialIcons-Regular.otf": "7e7a6cccddf6d7b20012a548461d5d81",
+"index.html": "9c04110a1d9d46528624abe703eefc5b",
+"/": "9c04110a1d9d46528624abe703eefc5b",
+"version.json": "0099ef9015c2598eb3219c70959b156e",
 "icons/Icon-maskable-192.png": "c457ef57daa1d16f64b27b786ec2ea3c",
 "icons/Icon-maskable-512.png": "301a7604d45b3e739efc881eb04896ea",
 "icons/Icon-512.png": "96e752610906ba2a93c65f8abe1645f1",
 "icons/Icon-192.png": "ac9a721a12bbc803b44f645561ecb1e1",
-"main.dart.js": "b22a3dddb366941179b5a648efda734a",
+"main.dart.js": "3b813c76a74698ba631d80ff1ace2656",
 "favicon.png": "5dcef449791fa27946b3d35ad8803796",
-"manifest.json": "5fefc70adcce3f4d7ff78169c1202c78"
+"manifest.json": "5fefc70adcce3f4d7ff78169c1202c78",
+"canvaskit/profiling/canvaskit.js": "ae2949af4efc61d28a4a80fffa1db900",
+"canvaskit/profiling/canvaskit.wasm": "95e736ab31147d1b2c7b25f11d4c32cd",
+"canvaskit/canvaskit.js": "c2b4e5f3d7a3d82aed024e7249a78487",
+"canvaskit/canvaskit.wasm": "4b83d89d9fecbea8ca46f2f760c5a9ba"
 };
 
 // The application shell files that are downloaded before a service worker can
@@ -35,7 +39,7 @@ self.addEventListener("install", (event) => {
   return event.waitUntil(
     caches.open(TEMP).then((cache) => {
       return cache.addAll(
-        CORE.map((value) => new Request(value + '?revision=' + RESOURCES[value], {'cache': 'reload'})));
+        CORE.map((value) => new Request(value, {'cache': 'reload'})));
     })
   );
 });
