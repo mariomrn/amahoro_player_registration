@@ -19,7 +19,21 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.red,
+        primarySwatch: const MaterialColor(
+          0xffa37765, // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.
+          <int, Color>{
+            50 : Color(0xffe3d6d1),//10%
+            100: Color(0xffd1bbb2),//20%
+            200: Color(0xffbfa093),//30%
+            300: Color(0xffac8574),//40%
+            400: Color(0xffa37765),//50%
+            500: Color(0xff825f51),//60%
+            600: Color(0xff725347),//70%
+            700: Color(0xff62473d),//80%
+            800: Color(0xff413028),//90%
+            900: Color(0xff211814),//100%
+          },
+        ),
       ),
       home: const MyHomePage(title: 'Amahoro'),
     );
@@ -38,8 +52,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
   static const List<Widget> _screens = <Widget>[
-    ViewPlayerScreen(),
     AddPlayerScreen(),
+    ViewPlayerScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -60,12 +74,12 @@ class _MyHomePageState extends State<MyHomePage> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.image_search),
-            label: 'Show',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.add),
             label: 'Add',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.image_search),
+            label: 'Show',
           ),
         ],
         currentIndex: _selectedIndex,
