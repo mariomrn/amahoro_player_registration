@@ -14,13 +14,11 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
     Player(
         firstName: 'Onika',
         lastName: 'Käse',
-        birthday: DateTime(1999),
-        id: 1234),
+        birthday: DateTime(1999)),
     Player(
         firstName: 'Tay',
         lastName: 'Lor',
-        birthday: DateTime(2000),
-        id: 1235),
+        birthday: DateTime(2000)),
   ];
 
   List<Widget> _buildList (){

@@ -1,4 +1,6 @@
+import 'package:amahoro_player_registration/models/player.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddPlayerScreen extends StatefulWidget {
   const AddPlayerScreen({Key? key}) : super(key: key);
@@ -8,6 +10,8 @@ class AddPlayerScreen extends StatefulWidget {
 }
 
 class _AddPlayerScreenState extends State<AddPlayerScreen> {
+
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   DateTime selectedDate = DateTime.now();
@@ -45,6 +49,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
             },
           ),
           Text(selectedDate.toIso8601String()),
+          Player(firstName: 'Kimi', lastName: 'sagara', birthday: DateTime(2000),),
           TextButton(
             child: const Text('Press me'),
             onPressed: () {
