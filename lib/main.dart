@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Registration',
       theme: ThemeData(
         primarySwatch: const MaterialColor(
           0xffa37765, // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.
