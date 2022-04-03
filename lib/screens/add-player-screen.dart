@@ -69,7 +69,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
         .add({
       'firstName': firstNameController.text, // John Doe
       'lastName': lastNameController.text, // Stokes and Sons
-      'birthday': selectedDate // 42
+      'birthday': selectedDate.millisecondsSinceEpoch // 42
     })
         .then((value) => print("Player Added"))
         .catchError((error) => print("Failed to add user: $error"));

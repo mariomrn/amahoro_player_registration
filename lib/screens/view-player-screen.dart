@@ -1,5 +1,6 @@
-import 'package:amahoro_player_registration/models/player.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ViewPlayerScreen extends StatefulWidget {
   const ViewPlayerScreen({Key? key}) : super(key: key);
@@ -9,37 +10,55 @@ class ViewPlayerScreen extends StatefulWidget {
 }
 
 class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
-  List<Player> playerList = [
-    Player(
-      firstName: 'Onika',
-      lastName: 'Käse',
-      birthday: DateTime(1999),
-      playerID: 123124,
-    ),
-    Player(
-      firstName: 'Tay',
-      lastName: 'Lor',
-      birthday: DateTime(2000),
-      playerID: 20137,
-    ),
-  ];
+  List playerList = [];
+  final CollectionReference collectionRef =
+      FirebaseFirestore.instance.collection("player");
 
-  List<Widget> _buildList() {
-    List<ListTile> listTiles = [];
-    for (Player player in playerList) {
-      listTiles.add(ListTile(
-        title: Text(player.firstName + " " + player.lastName),
-        subtitle: Text(player.birthday.toString()),
-      ));
+  Future getData() async {
+    try {
+      await collectionRef.get().then((querySnapshot) {
+        for (var result in querySnapshot.docs) {
+          playerList.add(result.data());
+        }
+      });
+      return playerList;
+    } catch (e) {
+      debugPrint("Error - $e");
+      return null;
     }
-    return listTiles;
   }
+
+  Widget buildItems(dataList) => ListView.separated(
+      padding: const EdgeInsets.all(8),
+      itemCount: dataList.length,
+      separatorBuilder: (BuildContext context, int index) => const Divider(),
+      itemBuilder: (BuildContext context, int index) {
+        return ListTile(
+          title: Text(
+            dataList[index]["firstName"] + ' ' + dataList[index]["lastName"],
+          ),
+          subtitle: Text(DateFormat('dd.MM.yyyy').format(DateTime.fromMillisecondsSinceEpoch(dataList[index]["birthday"]))),
+        );
+      });
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Column(
-        children: _buildList(),
+      child: Scaffold(
+        body: FutureBuilder(
+          future: getData(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return const Text(
+                "Something went wrong",
+              );
+            }
+            if (snapshot.connectionState == ConnectionState.done) {
+              return buildItems(playerList);
+            }
+            return const Center(child: CircularProgressIndicator());
+          },
+        ),
       ),
     );
   }
