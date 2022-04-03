@@ -38,6 +38,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
             dataList[index]["firstName"] + ' ' + dataList[index]["lastName"],
           ),
           subtitle: Text(DateFormat('dd.MM.yyyy').format(DateTime.fromMillisecondsSinceEpoch(dataList[index]["birthday"]))),
+          trailing: Text(dataList[index]["positions"]),
         );
       });
 
