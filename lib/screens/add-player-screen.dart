@@ -15,13 +15,19 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final CollectionReference seasonsCollectionRef =
   FirebaseFirestore.instance.collection("seasons");
+  CollectionReference teamsCollectionRef =
+  FirebaseFirestore.instance.collection("teams");
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   DateTime selectedDate = DateTime.now();
   bool dateGotSelected = false;
-  List seasonsList = [];
+  List seasonsTitleList = [];
+  List teamsList = [];
+  List seasonsDocumentList = [];
   int selectedLeague = 0;
+  int selectedTeam = 0;
   late Future _futureGetSeasons;
+  late Future _futureGetTeams;
 
   _selectDate(BuildContext context) async {
     final DateTime? selected = await showDatePicker(
@@ -46,6 +52,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
   void initState() {
     super.initState();
     _futureGetSeasons = getSeasons();
+    _futureGetTeams = getTeams();
   }
 
   @override
@@ -69,7 +76,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                 if (snapshot.connectionState == ConnectionState.done) {
                   return Wrap(
                     children: List<Widget>.generate(
-                      seasonsList.length,
+                      seasonsTitleList.length,
                           (int index) {
                         return Padding(
                           padding: const EdgeInsets.all(2.0),
@@ -79,7 +86,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                                 ? kDefaultTextStyle.copyWith(color: Colors.white)
                                 : kDefaultTextStyle.copyWith(color: Colors.grey.shade600),
                             backgroundColor: Colors.grey.shade200,
-                            label: Text(seasonsList[index]['title']),
+                            label: Text(seasonsTitleList[index]['title']),
                             selected: selectedLeague==index,
                             onSelected: (bool selected) {
                               setState(() {
@@ -95,6 +102,42 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
               },
             ),
             buildTitle('Team'),
+            FutureBuilder(
+              future: _futureGetTeams,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return const Text(
+                    "Something went wrong",
+                  );
+                }
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return Wrap(
+                      children: List<Widget>.generate(
+                        teamsList[selectedLeague]['teams'].length,
+                            (int index) {
+                          return Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: ChoiceChip(
+                              selectedColor: const Color.fromRGBO(163, 119, 101, 1),
+                              labelStyle: selectedTeam==index
+                                  ? kDefaultTextStyle.copyWith(color: Colors.white)
+                                  : kDefaultTextStyle.copyWith(color: Colors.grey.shade600),
+                              backgroundColor: Colors.grey.shade200,
+                              label: Text(teamsList[selectedLeague]['teams'][index]),
+                              selected: selectedTeam==index,
+                              onSelected: (bool selected) {
+                                setState(() {
+                                  selectedTeam=index;
+                                });
+                              },
+                            ),
+                          );
+                        },
+                      ).toList());
+                }
+                return const Center(child: CircularProgressIndicator());
+              },
+            ),
             buildTitle('First Name'),
             TextField(
               controller: firstNameController,
@@ -178,10 +221,26 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
     try {
       await seasonsCollectionRef.get().then((querySnapshot) {
         for (var result in querySnapshot.docs) {
-          seasonsList.add(result.data());
+          seasonsTitleList.add(result.data());
+          print(seasonsTitleList);
         }
       });
-      return seasonsList;
+      return seasonsTitleList;
+    } catch (e) {
+      debugPrint("Error - $e");
+      return null;
+    }
+  }
+
+  Future getTeams() async {
+    try {
+      await teamsCollectionRef.get().then((querySnapshot) {
+        for (var result in querySnapshot.docs) {
+          teamsList.add(result.data());
+        }
+        print(teamsList[selectedLeague]['teams']);
+      });
+      return teamsCollectionRef;
     } catch (e) {
       debugPrint("Error - $e");
       return null;
