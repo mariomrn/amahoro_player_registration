@@ -13,23 +13,15 @@ class AddPlayerScreen extends StatefulWidget {
 
 class _AddPlayerScreenState extends State<AddPlayerScreen> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final CollectionReference seasonsCollectionRef =
+  FirebaseFirestore.instance.collection("seasons");
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   DateTime selectedDate = DateTime.now();
   bool dateGotSelected = false;
-  List<int> selectedPositions = [];
-  List<String> positions = [
-    'Goalkeeper',
-    'Right Fullback',
-    'Left Fullback',
-    'Center Back',
-    'Defending',
-    'Right Midfielder',
-    'Central',
-    'Striker',
-    'Attacking Midfielder',
-    'Left Midfielder',
-  ];
+  List seasonsList = [];
+  int selectedLeague = 0;
+  late Future _futureGetSeasons;
 
   _selectDate(BuildContext context) async {
     final DateTime? selected = await showDatePicker(
@@ -51,6 +43,12 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _futureGetSeasons = getSeasons();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
@@ -59,6 +57,44 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            buildTitle('Season'),
+            FutureBuilder(
+              future: _futureGetSeasons,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return const Text(
+                    "Something went wrong",
+                  );
+                }
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return Wrap(
+                    children: List<Widget>.generate(
+                      seasonsList.length,
+                          (int index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: ChoiceChip(
+                            selectedColor: const Color.fromRGBO(163, 119, 101, 1),
+                            labelStyle: selectedLeague==index
+                                ? kDefaultTextStyle.copyWith(color: Colors.white)
+                                : kDefaultTextStyle.copyWith(color: Colors.grey.shade600),
+                            backgroundColor: Colors.grey.shade200,
+                            label: Text(seasonsList[index]['title']),
+                            selected: selectedLeague==index,
+                            onSelected: (bool selected) {
+                              setState(() {
+                                selectedLeague=index;
+                              });
+                            },
+                          ),
+                        );
+                      },
+                    ).toList());
+                }
+                return const Center(child: CircularProgressIndicator());
+              },
+            ),
+            buildTitle('Team'),
             buildTitle('First Name'),
             TextField(
               controller: firstNameController,
@@ -91,33 +127,6 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                 ),
               ],
             ),
-            buildTitle('Positions'),
-            Wrap(
-              children: List<Widget>.generate(
-                positions.length,
-                (int index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(2.0),
-                    child: ChoiceChip(
-                      selectedColor: const Color.fromRGBO(163, 119, 101, 1),
-                      labelStyle: selectedPositions.contains(index)
-                          ? kDefaultTextStyle.copyWith(color: Colors.white)
-                          : kDefaultTextStyle.copyWith(color: Colors.grey.shade600),
-                      backgroundColor: Colors.grey.shade200,
-                      label: Text(positions[index]),
-                      selected: selectedPositions.contains(index),
-                      onSelected: (bool selected) {
-                        setState(() {
-                          selectedPositions.contains(index)
-                              ? selectedPositions.remove(index)
-                              : selectedPositions.add(index);
-                        });
-                      },
-                    ),
-                  );
-                },
-              ).toList(),
-            ),
             Row(
               children: [
                 Expanded(
@@ -136,7 +145,6 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                       lastNameController.clear();
                       selectedDate = DateTime.now();
                       dateGotSelected = false;
-                      selectedPositions.clear();
                     });
                   },
                 ),
@@ -151,14 +159,6 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
     );
   }
 
-  String getPositions() {
-    String result = '';
-    for (int index in selectedPositions) {
-      result = result + positions[index] + ", ";
-    }
-    return result;
-  }
-
   Future<void> addPlayer() {
     CollectionReference players =
         FirebaseFirestore.instance.collection('player');
@@ -169,9 +169,23 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
           'lastName': lastNameController.text,
           'birthday': selectedDate.millisecondsSinceEpoch,
           'playerID': DateTime.now().microsecondsSinceEpoch,
-          'positions': getPositions(),
         })
         .then((value) => print("Player Added"))
         .catchError((error) => print("Failed to add user: $error"));
   }
+
+  Future getSeasons() async {
+    try {
+      await seasonsCollectionRef.get().then((querySnapshot) {
+        for (var result in querySnapshot.docs) {
+          seasonsList.add(result.data());
+        }
+      });
+      return seasonsList;
+    } catch (e) {
+      debugPrint("Error - $e");
+      return null;
+    }
+  }
+
 }
