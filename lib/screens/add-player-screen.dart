@@ -13,7 +13,7 @@ class AddPlayerScreen extends StatefulWidget {
 
 class _AddPlayerScreenState extends State<AddPlayerScreen> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  final CollectionReference leagueCollectionRef =
+  CollectionReference leagueCollectionRef =
   FirebaseFirestore.instance.collection("league");
   CollectionReference teamsCollectionRef =
   FirebaseFirestore.instance.collection("teams");
@@ -22,11 +22,19 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
   DateTime selectedDate = DateTime.now();
   bool dateGotSelected = false;
   List leagueTitleList = [];
-  List teamsList = [];
   List leagueDocumentList = [];
+  List seasonsTitleList = [];
+  List seasonsDocumentList = [];
+  List teamsTitleList = [];
+  List teamsDocumentList = [];
   int selectedLeague = 0;
+  int selectedSeason = 0;
   int selectedTeam = 0;
+  String docID1 = "";
+  String docID2 = "";
+  String docID3 = "";
   late Future _futureGetLeagues;
+  late Future _futureGetSeasons;
   late Future _futureGetTeams;
 
   _selectDate(BuildContext context) async {
@@ -52,7 +60,8 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
   void initState() {
     super.initState();
     _futureGetLeagues = getLeagues();
-    _futureGetTeams = getTeams('SCj8y26uZv0o5HVffb4j');
+    _futureGetSeasons = getSeasons('SCj8y26uZv0o5HVffb4j');
+    _futureGetTeams = getTeams('SCj8y26uZv0o5HVffb4j', '1SVxOxjFnOHZzAKhRJ0y');
   }
 
   @override
@@ -90,7 +99,8 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                             selected: selectedLeague==index,
                             onSelected: (bool selected) {
                               setState(() {
-                                getTeams(leagueDocumentList[index]);
+                                docID1 = leagueDocumentList[index];
+                                getSeasons(docID1);
                                 selectedLeague=index;
                               });
                             },
@@ -98,6 +108,45 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                         );
                       },
                     ).toList());
+                }
+                return const Center(child: CircularProgressIndicator());
+              },
+            ),
+            buildTitle('Seasons'),
+            FutureBuilder(
+              future: _futureGetSeasons,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return const Text(
+                    "Something went wrong",
+                  );
+                }
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return Wrap(
+                      children: List<Widget>.generate(
+                        seasonsTitleList.length,
+                            (int index) {
+                          return Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: ChoiceChip(
+                              selectedColor: const Color.fromRGBO(163, 119, 101, 1),
+                              labelStyle: selectedSeason==index
+                                  ? kDefaultTextStyle.copyWith(color: Colors.white)
+                                  : kDefaultTextStyle.copyWith(color: Colors.grey.shade600),
+                              backgroundColor: Colors.grey.shade200,
+                              label: Text(seasonsTitleList[index]['title']),
+                              selected: selectedSeason==index,
+                              onSelected: (bool selected) {
+                                setState(() {
+                                  docID2 = seasonsDocumentList[index];
+                                  getTeams(docID1, docID2);
+                                  selectedSeason=index;
+                                });
+                              },
+                            ),
+                          );
+                        },
+                      ).toList());
                 }
                 return const Center(child: CircularProgressIndicator());
               },
@@ -112,29 +161,33 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                   );
                 }
                 if (snapshot.connectionState == ConnectionState.done) {
-                  return Wrap(
-                      children: List<Widget>.generate(
-                        teamsList.length,
-                            (int index) {
-                          return Padding(
-                            padding: const EdgeInsets.all(2.0),
-                            child: ChoiceChip(
-                              selectedColor: const Color.fromRGBO(163, 119, 101, 1),
-                              labelStyle: selectedTeam==index
-                                  ? kDefaultTextStyle.copyWith(color: Colors.white)
-                                  : kDefaultTextStyle.copyWith(color: Colors.grey.shade600),
-                              backgroundColor: Colors.grey.shade200,
-                              label: Text(teamsList[index]['title']),
-                              selected: selectedTeam==index,
-                              onSelected: (bool selected) {
-                                setState(() {
-                                  selectedTeam=index;
-                                });
-                              },
-                            ),
-                          );
-                        },
-                      ).toList());
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                        children: List<Widget>.generate(
+                          teamsTitleList.length,
+                              (int index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: ChoiceChip(
+                                selectedColor: const Color.fromRGBO(163, 119, 101, 1),
+                                labelStyle: selectedTeam==index
+                                    ? kDefaultTextStyle.copyWith(color: Colors.white)
+                                    : kDefaultTextStyle.copyWith(color: Colors.grey.shade600),
+                                backgroundColor: Colors.grey.shade200,
+                                label: Text(teamsTitleList[index]['title']),
+                                selected: selectedTeam==index,
+                                onSelected: (bool selected) {
+                                  setState(() {
+                                    docID3 = teamsDocumentList[selectedTeam];
+                                    selectedTeam=index;
+                                  });
+                                },
+                              ),
+                            );
+                          },
+                        ).toList()),
+                  );
                 }
                 return const Center(child: CircularProgressIndicator());
               },
@@ -204,15 +257,13 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
   }
 
   Future<void> addPlayer() {
-    CollectionReference players =
-        FirebaseFirestore.instance.collection('player');
-    // Call the user's CollectionReference to add a new user
-    return players
+    print('docID3');
+    print(docID3);
+    return  leagueCollectionRef.doc(docID1).collection('season').doc(docID2).collection('teams').doc(docID3).collection('players')
         .add({
           'firstName': firstNameController.text,
           'lastName': lastNameController.text,
           'birthday': selectedDate.millisecondsSinceEpoch,
-          'playerID': DateTime.now().microsecondsSinceEpoch,
         })
         .then((value) => print("Player Added"))
         .catchError((error) => print("Failed to add user: $error"));
@@ -224,9 +275,8 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
         for (var result in querySnapshot.docs) {
           leagueDocumentList.add(result.id);
           leagueTitleList.add(result.data());
-          print(leagueTitleList);
-          print("$leagueDocumentList  leagueDocumentList");
         }
+        docID1 = leagueDocumentList[selectedLeague];
       });
       return leagueTitleList;
     } catch (e) {
@@ -235,39 +285,44 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
     }
   }
 
-  Future getTeams(String docID) async {
+  Future getSeasons(String docID) async {
     try {
-      await leagueCollectionRef.doc(docID).collection('teams').get().then((querySnapshot) {
-        teamsList.clear();
+      await leagueCollectionRef.doc(docID).collection('season').get().then((querySnapshot) {
+        seasonsTitleList.clear();
+        seasonsDocumentList.clear();
         for (var result in querySnapshot.docs) {
-          //tile einer liga und dic id abspeichern und zugehörige teams laden
-          teamsList.add(result.data());
-          print('teamslist');
-          print(teamsList);
+          seasonsTitleList.add(result.data());
+          seasonsDocumentList.add(result.id);
         }
       });
       setState(() {
+        docID2 = seasonsDocumentList[selectedSeason];
+        getTeams(docID1, docID2);
       });
-      return teamsList;
+      return seasonsTitleList;
     } catch (e) {
       debugPrint("Error - $e");
       return null;
     }
   }
-
-  // Future getTeams() async {
-  //   try {
-  //     await teamsCollectionRef.get().then((querySnapshot) {
-  //       for (var result in querySnapshot.docs) {
-  //         teamsList.add(result.data());
-  //       }
-  //       print(teamsList[selectedLeague]['teams']);
-  //     });
-  //     return teamsCollectionRef;
-  //   } catch (e) {
-  //     debugPrint("Error - $e");
-  //     return null;
-  //   }
-  // }
-
+  
+  Future getTeams(String docID1, String docID2) async {
+    try {
+      await leagueCollectionRef.doc(docID1).collection('season').doc(docID2).collection('teams').get().then((querySnapshot) {
+        teamsTitleList.clear();
+        teamsDocumentList.clear();
+        for (var result in querySnapshot.docs) {
+          teamsTitleList.add(result.data());
+          teamsDocumentList.add(result.id);
+        }
+      });
+      setState(() {
+        docID3 = teamsDocumentList[selectedTeam];
+      });
+      return teamsTitleList;
+    } catch (e) {
+      debugPrint("Error - $e");
+      return null;
+    }
+  }
 }
