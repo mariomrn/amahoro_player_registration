@@ -131,58 +131,61 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                     );
                   }
                   if (snapshot.connectionState == ConnectionState.done) {
-                    return Wrap(
-                        children: List<Widget>.generate(
-                      seasonsTitleList.length +1 ,
-                      (int index) {
-                        if (index == seasonsTitleList.length) {
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                          children: List<Widget>.generate(
+                        seasonsTitleList.length +1 ,
+                        (int index) {
+                          if (index == seasonsTitleList.length) {
+                            return Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: ChoiceChip(
+                                selectedColor: const Color.fromRGBO(163, 119, 101, 0),
+                                labelStyle: kDefaultTextStyle.copyWith(
+                                    color: Colors.white),
+                                backgroundColor: Colors.grey.shade200,
+                                label: const Icon(
+                                  Icons.add,
+                                  color: Color.fromRGBO(163, 119, 101, 1),
+                                  size: 15,
+                                ),
+                                selected: true,
+                                onSelected: (bool selected) {
+                                  setState(() {
+                                    buildShowDialog(context, 'Add a Season', leagueCollectionRef
+                                        .doc(docID1)
+                                        .collection('season'));
+                                  });
+                                },
+                              ),
+                            );
+                          }
                           return Padding(
                             padding: const EdgeInsets.all(2.0),
                             child: ChoiceChip(
-                              selectedColor: const Color.fromRGBO(163, 119, 101, 0),
-                              labelStyle: kDefaultTextStyle.copyWith(
-                                  color: Colors.white),
+                              selectedColor:
+                                  const Color.fromRGBO(163, 119, 101, 1),
+                              labelStyle: selectedSeason == index
+                                  ? kDefaultTextStyle.copyWith(
+                                      color: Colors.white)
+                                  : kDefaultTextStyle.copyWith(
+                                      color: Colors.grey.shade600),
                               backgroundColor: Colors.grey.shade200,
-                              label: const Icon(
-                                Icons.add,
-                                color: Color.fromRGBO(163, 119, 101, 1),
-                                size: 15,
-                              ),
-                              selected: true,
+                              label: Text(seasonsTitleList[index]['title']),
+                              selected: selectedSeason == index,
                               onSelected: (bool selected) {
                                 setState(() {
-                                  buildShowDialog(context, 'Add a Season', leagueCollectionRef
-                                      .doc(docID1)
-                                      .collection('season'));
+                                  docID2 = seasonsDocumentList[index];
+                                  getTeams(docID1, docID2);
+                                  selectedSeason = index;
                                 });
                               },
                             ),
                           );
-                        }
-                        return Padding(
-                          padding: const EdgeInsets.all(2.0),
-                          child: ChoiceChip(
-                            selectedColor:
-                                const Color.fromRGBO(163, 119, 101, 1),
-                            labelStyle: selectedSeason == index
-                                ? kDefaultTextStyle.copyWith(
-                                    color: Colors.white)
-                                : kDefaultTextStyle.copyWith(
-                                    color: Colors.grey.shade600),
-                            backgroundColor: Colors.grey.shade200,
-                            label: Text(seasonsTitleList[index]['title']),
-                            selected: selectedSeason == index,
-                            onSelected: (bool selected) {
-                              setState(() {
-                                docID2 = seasonsDocumentList[index];
-                                getTeams(docID1, docID2);
-                                selectedSeason = index;
-                              });
-                            },
-                          ),
-                        );
-                      },
-                    ).toList());
+                        },
+                      ).toList()),
+                    );
                   }
                   return const Center(child: CircularProgressIndicator());
                 },
