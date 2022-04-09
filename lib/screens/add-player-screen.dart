@@ -15,8 +15,6 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionReference leagueCollectionRef =
       FirebaseFirestore.instance.collection("league");
-  CollectionReference teamsCollectionRef =
-      FirebaseFirestore.instance.collection("teams");
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   DateTime selectedDate = DateTime.now();
@@ -75,224 +73,226 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(15.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              buildTitle('Leagues'),
-              FutureBuilder(
-                future: _futureGetLeagues,
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return const Text(
-                      "Something went wrong",
-                    );
-                  }
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return Wrap(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            buildTitle('Leagues'),
+            FutureBuilder(
+              future: _futureGetLeagues,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return const Text(
+                    "Something went wrong",
+                  );
+                }
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return Wrap(
+                      children: List<Widget>.generate(
+                    leagueTitleList.length,
+                    (int index) {
+                      return Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: ChoiceChip(
+                          selectedColor:
+                              const Color.fromRGBO(163, 119, 101, 1),
+                          labelStyle: selectedLeague == index
+                              ? kDefaultTextStyle.copyWith(
+                                  color: Colors.white)
+                              : kDefaultTextStyle.copyWith(
+                                  color: Colors.grey.shade600),
+                          backgroundColor: Colors.grey.shade200,
+                          label: Text(leagueTitleList[index]['title']),
+                          selected: selectedLeague == index,
+                          onSelected: (bool selected) {
+                            setState(() {
+                              docID1 = leagueDocumentList[index];
+                              getSeasons(docID1);
+                              selectedLeague = index;
+                            });
+                          },
+                        ),
+                      );
+                    },
+                  ).toList());
+                }
+                return const Center(child: CircularProgressIndicator());
+              },
+            ),
+            buildTitle('Seasons'),
+            FutureBuilder(
+              future: _futureGetSeasons,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return const Text(
+                    "Something went wrong",
+                  );
+                }
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
                         children: List<Widget>.generate(
-                      leagueTitleList.length,
+                      seasonsTitleList.length +1 ,
                       (int index) {
+                        if (index == seasonsTitleList.length) {
+                          return Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: ChoiceChip(
+                              selectedColor: const Color.fromRGBO(163, 119, 101, 0),
+                              labelStyle: kDefaultTextStyle.copyWith(
+                                  color: Colors.white),
+                              backgroundColor: Colors.grey.shade200,
+                              label: const Icon(
+                                Icons.add,
+                                color: Color.fromRGBO(163, 119, 101, 1),
+                                size: 15,
+                              ),
+                              selected: true,
+                              onSelected: (bool selected) {
+                                setState(() {
+                                  buildShowDialog(context, 'Season', leagueCollectionRef
+                                      .doc(docID1)
+                                      .collection('season'));
+                                });
+                              },
+                            ),
+                          );
+                        }
                         return Padding(
                           padding: const EdgeInsets.all(2.0),
                           child: ChoiceChip(
                             selectedColor:
                                 const Color.fromRGBO(163, 119, 101, 1),
-                            labelStyle: selectedLeague == index
+                            labelStyle: selectedSeason == index
                                 ? kDefaultTextStyle.copyWith(
                                     color: Colors.white)
                                 : kDefaultTextStyle.copyWith(
                                     color: Colors.grey.shade600),
                             backgroundColor: Colors.grey.shade200,
-                            label: Text(leagueTitleList[index]['title']),
-                            selected: selectedLeague == index,
+                            label: Text(seasonsTitleList[index]['title']),
+                            selected: selectedSeason == index,
                             onSelected: (bool selected) {
                               setState(() {
-                                docID1 = leagueDocumentList[index];
-                                getSeasons(docID1);
-                                selectedLeague = index;
+                                docID2 = seasonsDocumentList[index];
+                                getTeams(docID1, docID2);
+                                selectedSeason = index;
                               });
                             },
                           ),
                         );
                       },
-                    ).toList());
-                  }
-                  return const Center(child: CircularProgressIndicator());
-                },
-              ),
-              buildTitle('Seasons'),
-              FutureBuilder(
-                future: _futureGetSeasons,
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return const Text(
-                      "Something went wrong",
-                    );
-                  }
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                          children: List<Widget>.generate(
-                        seasonsTitleList.length +1 ,
-                        (int index) {
-                          if (index == seasonsTitleList.length) {
-                            return Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: ChoiceChip(
-                                selectedColor: const Color.fromRGBO(163, 119, 101, 0),
-                                labelStyle: kDefaultTextStyle.copyWith(
-                                    color: Colors.white),
-                                backgroundColor: Colors.grey.shade200,
-                                label: const Icon(
-                                  Icons.add,
-                                  color: Color.fromRGBO(163, 119, 101, 1),
-                                  size: 15,
-                                ),
-                                selected: true,
-                                onSelected: (bool selected) {
-                                  setState(() {
-                                    buildShowDialog(context, 'Add a Season', leagueCollectionRef
-                                        .doc(docID1)
-                                        .collection('season'));
-                                  });
-                                },
-                              ),
-                            );
-                          }
+                    ).toList()),
+                  );
+                }
+                return const Center(child: CircularProgressIndicator());
+              },
+            ),
+            buildTitle('Teams'),
+            FutureBuilder(
+              future: _futureGetTeams,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return const Text(
+                    "Something went wrong",
+                  );
+                }
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                        children: List<Widget>.generate(
+                      teamsTitleList.length + 1,
+                      (int index) {
+                        if (index == teamsTitleList.length) {
                           return Padding(
                             padding: const EdgeInsets.all(2.0),
                             child: ChoiceChip(
-                              selectedColor:
-                                  const Color.fromRGBO(163, 119, 101, 1),
-                              labelStyle: selectedSeason == index
-                                  ? kDefaultTextStyle.copyWith(
-                                      color: Colors.white)
-                                  : kDefaultTextStyle.copyWith(
-                                      color: Colors.grey.shade600),
+                              selectedColor: const Color.fromRGBO(163, 119, 101, 0),
+                              labelStyle: kDefaultTextStyle.copyWith(
+                                  color: Colors.white),
                               backgroundColor: Colors.grey.shade200,
-                              label: Text(seasonsTitleList[index]['title']),
-                              selected: selectedSeason == index,
+                              label: const Icon(
+                                Icons.add,
+                                color: Color.fromRGBO(163, 119, 101, 1),
+                                size: 15,
+                              ),
+                              selected: true,
                               onSelected: (bool selected) {
                                 setState(() {
-                                  docID2 = seasonsDocumentList[index];
-                                  getTeams(docID1, docID2);
-                                  selectedSeason = index;
+                                  buildShowDialog(context, 'Team', leagueCollectionRef
+                                      .doc(docID1)
+                                      .collection('season')
+                                      .doc(docID2)
+                                      .collection('teams'));
                                 });
                               },
                             ),
                           );
-                        },
-                      ).toList()),
-                    );
-                  }
-                  return const Center(child: CircularProgressIndicator());
-                },
-              ),
-              buildTitle('Teams'),
-              FutureBuilder(
-                future: _futureGetTeams,
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return const Text(
-                      "Something went wrong",
-                    );
-                  }
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                          children: List<Widget>.generate(
-                        teamsTitleList.length + 1,
-                        (int index) {
-                          if (index == teamsTitleList.length) {
-                            return Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: ChoiceChip(
-                                selectedColor: const Color.fromRGBO(163, 119, 101, 0),
-                                labelStyle: kDefaultTextStyle.copyWith(
-                                    color: Colors.white),
-                                backgroundColor: Colors.grey.shade200,
-                                label: const Icon(
-                                  Icons.add,
-                                  color: Color.fromRGBO(163, 119, 101, 1),
-                                  size: 15,
-                                ),
-                                selected: true,
-                                onSelected: (bool selected) {
-                                  setState(() {
-                                    buildShowDialog(context, 'Add a Team', leagueCollectionRef
-                                        .doc(docID1)
-                                        .collection('season')
-                                        .doc(docID2)
-                                        .collection('teams'));
-                                  });
-                                },
-                              ),
-                            );
-                          }
-                          return Padding(
-                            padding: const EdgeInsets.all(2.0),
-                            child: ChoiceChip(
-                              selectedColor:
-                                  const Color.fromRGBO(163, 119, 101, 1),
-                              labelStyle: selectedTeam == index
-                                  ? kDefaultTextStyle.copyWith(
-                                      color: Colors.white)
-                                  : kDefaultTextStyle.copyWith(
-                                      color: Colors.grey.shade600),
-                              backgroundColor: Colors.grey.shade200,
-                              label: Text(teamsTitleList[index]['title']),
-                              selected: selectedTeam == index,
-                              onSelected: (bool selected) {
-                                setState(() {
-                                  docID3 = teamsDocumentList[selectedTeam];
-                                  selectedTeam = index;
-                                });
-                              },
-                            ),
-                          );
-                        },
-                      ).toList()),
-                    );
-                  }
-                  return const Center(child: CircularProgressIndicator());
-                },
-              ),
-              buildTitle('First Name'),
-              TextField(
-                controller: firstNameController,
-              ),
-              buildTitle('Last Name'),
-              TextField(
-                controller: lastNameController,
-              ),
-              buildTitle('Date Of Birth'),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    dateGotSelected
-                        ? DateFormat('dd.MM.yyyy').format(selectedDate)
-                        : 'no date selected',
-                    style: kDefaultTextStyle.copyWith(
-                        color: dateGotSelected
-                            ? Colors.grey.shade900
-                            : Colors.grey.shade500),
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: ChoiceChip(
+                            selectedColor:
+                                const Color.fromRGBO(163, 119, 101, 1),
+                            labelStyle: selectedTeam == index
+                                ? kDefaultTextStyle.copyWith(
+                                    color: Colors.white)
+                                : kDefaultTextStyle.copyWith(
+                                    color: Colors.grey.shade600),
+                            backgroundColor: Colors.grey.shade200,
+                            label: Text(teamsTitleList[index]['title']),
+                            selected: selectedTeam == index,
+                            onSelected: (bool selected) {
+                              setState(() {
+                                docID3 = teamsDocumentList[selectedTeam];
+                                selectedTeam = index;
+                              });
+                            },
+                          ),
+                        );
+                      },
+                    ).toList()),
+                  );
+                }
+                return const Center(child: CircularProgressIndicator());
+              },
+            ),
+            buildTitle('First Name'),
+            TextField(
+              controller: firstNameController,
+            ),
+            buildTitle('Last Name'),
+            TextField(
+              controller: lastNameController,
+            ),
+            buildTitle('Date Of Birth'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  dateGotSelected
+                      ? DateFormat('dd.MM.yyyy').format(selectedDate)
+                      : 'no date selected',
+                  style: kDefaultTextStyle.copyWith(
+                      color: dateGotSelected
+                          ? Colors.grey.shade900
+                          : Colors.grey.shade500),
+                ),
+                TextButton(
+                  child: Text(
+                    'Choose Birthday',
+                    style: kDefaultTextStyle,
                   ),
-                  TextButton(
-                    child: Text(
-                      'Choose Birthday',
-                      style: kDefaultTextStyle,
-                    ),
-                    onPressed: () {
-                      _selectDate(context);
-                    },
-                  ),
-                ],
-              ),
-              Row(
+                  onPressed: () {
+                    _selectDate(context);
+                  },
+                ),
+              ],
+            ),
+            Expanded(child: Container(),),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
                 children: [
                   Expanded(
                     child: Container(),
@@ -308,7 +308,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                               firstNameController.text.isEmpty &&
                               lastNameController.text.isEmpty
                           ? Colors.grey.shade400
-                          : Color.fromRGBO(163, 119, 101, 1),
+                          : const Color.fromRGBO(163, 119, 101, 1),
                     ),
                     child: Text(
                       'Submit Player',
@@ -333,8 +333,8 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -347,7 +347,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                                     TextEditingController tempController =
                                     TextEditingController();
                                     return SimpleDialog(
-                                      title: Text(title),
+                                      title: Text('Add a ' + title),
                                       children: [
                                         Padding(
                                           padding: const EdgeInsets.all(20.0),
@@ -364,16 +364,13 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                                                   .text,
                                             })
                                                 .then((value) =>
-                                                print("Season Added"))
-                                                .catchError((error) => print(
-                                                "Failed to add user: $error"));
-                                            tempController.dispose();
+                                            print("Season Added")).catchError((error) => print("Failed to add user: $error")).then((value) => tempController.dispose());
                                             Navigator.pop(context);
                                             setState(() {
-                                              getLeagues();
+                                              getLeagues().then((value1) => getSeasons(value1).then((value2) => getTeams(value1, value2)));
                                             });
                                           },
-                                          child: const Text('Add Season'),
+                                          child: Text('Add ' + title),
                                         ),
                                         SimpleDialogOption(
                                           onPressed: () {
@@ -410,13 +407,15 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
   Future getLeagues() async {
     try {
       await leagueCollectionRef.get().then((querySnapshot) {
+        leagueDocumentList.clear();
+        leagueTitleList.clear();
         for (var result in querySnapshot.docs) {
           leagueDocumentList.add(result.id);
           leagueTitleList.add(result.data());
         }
         docID1 = leagueDocumentList[selectedLeague];
       });
-      return leagueTitleList;
+      return docID1;
     } catch (e) {
       debugPrint("Error - $e");
       return null;
