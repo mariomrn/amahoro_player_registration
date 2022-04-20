@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -29,10 +30,12 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
     }
   }
 
-  firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
+  firebase_storage.FirebaseStorage storage =
+      firebase_storage.FirebaseStorage.instance;
 
   Future<String> downloadURL(String imageName) async {
-    String downloadURL = await storage.ref('players/' + imageName).getDownloadURL();
+    String downloadURL =
+        await storage.ref('players/' + imageName).getDownloadURL();
     return downloadURL;
   }
 
@@ -45,7 +48,9 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
           title: Text(
             dataList[index]["firstName"] + ' ' + dataList[index]["lastName"],
           ),
-          subtitle: Text(DateFormat('dd.MM.yyyy').format(DateTime.fromMillisecondsSinceEpoch(dataList[index]["birthday"]))),
+          subtitle: Text(DateFormat('dd.MM.yyyy').format(
+              DateTime.fromMillisecondsSinceEpoch(
+                  dataList[index]["birthday"]))),
           trailing: Text(dataList[index]["positions"]),
         );
       });
@@ -70,23 +75,45 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
             //     return const Center(child: CircularProgressIndicator());
             //   },
             // ),
+            ElevatedButton(
+                onPressed: () async {
+                  final result = await FilePicker.platform.pickFiles(
+                    allowMultiple: false,
+                    type: FileType.custom,
+                    allowedExtensions: ['png', 'jpg'],
+                  );
+                  if (result == null) {
+                    print('fehlerrrrrrrrr');
+                    return;
+                  }
+                  if (result != null && result.files.isNotEmpty) {
+                    final fileBytes = result.files.first.bytes;
+                    final fileName = result.files.first.name;
+                    // upload file
+                    await storage.ref('players/$fileName').putData(fileBytes!);
+                  }
+                },
+                child: Text('Upload a file')),
             FutureBuilder(
-              future: downloadURL('phipster.png'),
+              future: downloadURL('phipsiii.png'),
               builder: (context, AsyncSnapshot<String> snapshot) {
-              if (snapshot.hasError) {
-                return const Text(
-                  "Something went wrong",
-                );
-              }
-              if (snapshot.connectionState == ConnectionState.done) {
-                return Container(
-                  width: 300,
+                if (snapshot.hasError) {
+                  return const Text(
+                    "Something went wrong",
+                  );
+                }
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return Container(
+                    width: 300,
                     height: 300,
-                  child:
-                  Image.network(snapshot.data!, fit: BoxFit.cover,),);
-              }
-              return const Center(child: CircularProgressIndicator());
-            },
+                    child: Image.network(
+                      snapshot.data!,
+                      fit: BoxFit.cover,
+                    ),
+                  );
+                }
+                return const Center(child: CircularProgressIndicator());
+              },
             ),
           ],
         ),
