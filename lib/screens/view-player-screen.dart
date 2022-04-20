@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -28,6 +29,13 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
     }
   }
 
+  firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
+
+  Future<String> downloadURL(String imageName) async {
+    String downloadURL = await storage.ref('players/' + imageName).getDownloadURL();
+    return downloadURL;
+  }
+
   Widget buildItems(dataList) => ListView.separated(
       padding: const EdgeInsets.all(8),
       itemCount: dataList.length,
@@ -46,19 +54,41 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: FutureBuilder(
-          future: getData(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return const Text(
-                "Something went wrong",
-              );
-            }
-            if (snapshot.connectionState == ConnectionState.done) {
-              return buildItems(playerList);
-            }
-            return const Center(child: CircularProgressIndicator());
-          },
+        body: Column(
+          children: [
+            // FutureBuilder(
+            //   future: getData(),
+            //   builder: (context, snapshot) {
+            //     if (snapshot.hasError) {
+            //       return const Text(
+            //         "Something went wrong",
+            //       );
+            //     }
+            //     if (snapshot.connectionState == ConnectionState.done) {
+            //       return buildItems(playerList);
+            //     }
+            //     return const Center(child: CircularProgressIndicator());
+            //   },
+            // ),
+            FutureBuilder(
+              future: downloadURL('phipster.png'),
+              builder: (context, AsyncSnapshot<String> snapshot) {
+              if (snapshot.hasError) {
+                return const Text(
+                  "Something went wrong",
+                );
+              }
+              if (snapshot.connectionState == ConnectionState.done) {
+                return Container(
+                  width: 300,
+                    height: 300,
+                  child:
+                  Image.network(snapshot.data!, fit: BoxFit.cover,),);
+              }
+              return const Center(child: CircularProgressIndicator());
+            },
+            ),
+          ],
         ),
       ),
     );
