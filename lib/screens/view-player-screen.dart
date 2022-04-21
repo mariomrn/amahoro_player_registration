@@ -163,6 +163,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
 
   Widget buildItems(dataList) => ListView.separated(
       padding: const EdgeInsets.all(8),
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: dataList.length,
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
@@ -272,166 +273,168 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            BasicWidgets.buildTitle('Leagues'),
-            FutureBuilder(
-              future: _futureGetLeagues,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return const Text(
-                    "Something went wrong",
-                  );
-                }
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return Wrap(
-                      children: List<Widget>.generate(
-                    leagueTitleList.length,
-                    (int index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(2.0),
-                        child: ChoiceChip(
-                          selectedColor:
-                              const Color.fromRGBO(163, 119, 101, 1),
-                          labelStyle: selectedLeague == index
-                              ? kDefaultTextStyle.copyWith(
-                                  color: Colors.white)
-                              : kDefaultTextStyle.copyWith(
-                                  color: Colors.grey.shade600),
-                          backgroundColor: Colors.grey.shade200,
-                          label: Text(leagueTitleList[index]['title']),
-                          selected: selectedLeague == index,
-                          onSelected: (bool selected) {
-                            setState(() {
-                              docID1 = leagueDocumentList[index];
-                              getSeasons(docID1);
-                              selectedLeague = index;
-                            });
-                          },
-                        ),
-                      );
-                    },
-                  ).toList());
-                }
-                return const Center(child: CircularProgressIndicator());
-              },
-            ),
-            BasicWidgets.buildTitle('Seasons'),
-            FutureBuilder(
-              future: _futureGetSeasons,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return const Text(
-                    "Something went wrong",
-                  );
-                }
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
+        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              BasicWidgets.buildTitle('Leagues'),
+              FutureBuilder(
+                future: _futureGetLeagues,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return const Text(
+                      "Something went wrong",
+                    );
+                  }
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return Wrap(
                         children: List<Widget>.generate(
-                      seasonsTitleList.length,
+                      leagueTitleList.length,
                       (int index) {
                         return Padding(
                           padding: const EdgeInsets.all(2.0),
                           child: ChoiceChip(
                             selectedColor:
                                 const Color.fromRGBO(163, 119, 101, 1),
-                            labelStyle: selectedSeason == index
+                            labelStyle: selectedLeague == index
                                 ? kDefaultTextStyle.copyWith(
                                     color: Colors.white)
                                 : kDefaultTextStyle.copyWith(
                                     color: Colors.grey.shade600),
                             backgroundColor: Colors.grey.shade200,
-                            label: Text(seasonsTitleList[index]['title']),
-                            selected: selectedSeason == index,
+                            label: Text(leagueTitleList[index]['title']),
+                            selected: selectedLeague == index,
                             onSelected: (bool selected) {
                               setState(() {
-                                docID2 = seasonsDocumentList[index];
-                                getTeams(docID1, docID2);
-                                selectedSeason = index;
+                                docID1 = leagueDocumentList[index];
+                                getSeasons(docID1);
+                                selectedLeague = index;
                               });
                             },
                           ),
                         );
                       },
-                    ).toList()),
-                  );
-                }
-                return const Center(child: CircularProgressIndicator());
-              },
-            ),
-            BasicWidgets.buildTitle('Teams'),
-            FutureBuilder(
-              future: _futureGetTeams,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return const Text(
-                    "Something went wrong",
-                  );
-                }
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                        children: teamsTitleList.isEmpty
-                            ? [const Text('No Teams')]
-                            : List<Widget>.generate(
-                                teamsTitleList.length,
-                                (int index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: ChoiceChip(
-                                      selectedColor: const Color.fromRGBO(
-                                          163, 119, 101, 1),
-                                      labelStyle: selectedTeam == index
-                                          ? kDefaultTextStyle.copyWith(
-                                              color: Colors.white)
-                                          : kDefaultTextStyle.copyWith(
-                                              color: Colors.grey.shade600),
-                                      backgroundColor: Colors.grey.shade200,
-                                      label: Text(
-                                          teamsTitleList[index]['title']),
-                                      selected: selectedTeam == index,
-                                      onSelected: (bool selected) {
-                                        setState(() {
-                                          selectedTeam = index;
-                                          print('before' + docID3);
-                                          docID3 =
-                                              teamsDocumentList[selectedTeam];
-                                          print('after' + docID3);
-                                        });
-                                      },
-                                    ),
-                                  );
-                                },
-                              ).toList()),
-                  );
-                }
-                return const Center(child: CircularProgressIndicator());
-              },
-            ),
-            BasicWidgets.buildTitle('Members'),
-            FutureBuilder(
-              future: getData(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return const Text(
-                    "Something went wrong",
-                  );
-                }
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return playerList.isEmpty
-                      ? Text('No Player found')
-                      : buildItems(playerList);
-                }
-                return const Center(child: CircularProgressIndicator());
-              },
-            ),
-          ],
+                    ).toList());
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
+              BasicWidgets.buildTitle('Seasons'),
+              FutureBuilder(
+                future: _futureGetSeasons,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return const Text(
+                      "Something went wrong",
+                    );
+                  }
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                          children: List<Widget>.generate(
+                        seasonsTitleList.length,
+                        (int index) {
+                          return Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: ChoiceChip(
+                              selectedColor:
+                                  const Color.fromRGBO(163, 119, 101, 1),
+                              labelStyle: selectedSeason == index
+                                  ? kDefaultTextStyle.copyWith(
+                                      color: Colors.white)
+                                  : kDefaultTextStyle.copyWith(
+                                      color: Colors.grey.shade600),
+                              backgroundColor: Colors.grey.shade200,
+                              label: Text(seasonsTitleList[index]['title']),
+                              selected: selectedSeason == index,
+                              onSelected: (bool selected) {
+                                setState(() {
+                                  docID2 = seasonsDocumentList[index];
+                                  getTeams(docID1, docID2);
+                                  selectedSeason = index;
+                                });
+                              },
+                            ),
+                          );
+                        },
+                      ).toList()),
+                    );
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
+              BasicWidgets.buildTitle('Teams'),
+              FutureBuilder(
+                future: _futureGetTeams,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return const Text(
+                      "Something went wrong",
+                    );
+                  }
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                          children: teamsTitleList.isEmpty
+                              ? [const Text('No Teams')]
+                              : List<Widget>.generate(
+                                  teamsTitleList.length,
+                                  (int index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.all(2.0),
+                                      child: ChoiceChip(
+                                        selectedColor: const Color.fromRGBO(
+                                            163, 119, 101, 1),
+                                        labelStyle: selectedTeam == index
+                                            ? kDefaultTextStyle.copyWith(
+                                                color: Colors.white)
+                                            : kDefaultTextStyle.copyWith(
+                                                color: Colors.grey.shade600),
+                                        backgroundColor: Colors.grey.shade200,
+                                        label: Text(
+                                            teamsTitleList[index]['title']),
+                                        selected: selectedTeam == index,
+                                        onSelected: (bool selected) {
+                                          setState(() {
+                                            selectedTeam = index;
+                                            print('before' + docID3);
+                                            docID3 =
+                                                teamsDocumentList[selectedTeam];
+                                            print('after' + docID3);
+                                          });
+                                        },
+                                      ),
+                                    );
+                                  },
+                                ).toList()),
+                    );
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
+              BasicWidgets.buildTitle('Members'),
+              FutureBuilder(
+                future: getData(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return const Text(
+                      "Something went wrong",
+                    );
+                  }
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return playerList.isEmpty
+                        ? Text('No Player found')
+                        : buildItems(playerList);
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
