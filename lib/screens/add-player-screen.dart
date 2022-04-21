@@ -1,7 +1,10 @@
+import 'dart:typed_data';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:amahoro_player_registration/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-
 import '../theme/textStyles.dart';
 
 class AddPlayerScreen extends StatefulWidget {
@@ -15,10 +18,15 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionReference leagueCollectionRef =
       FirebaseFirestore.instance.collection("league");
+  firebase_storage.FirebaseStorage storage =
+      firebase_storage.FirebaseStorage.instance;
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   DateTime selectedDate = DateTime.now();
   bool dateGotSelected = false;
+  XFile? pickedImage;
+  Uint8List? imageBytes;
+  String? imageFileName;
   List leagueTitleList = [];
   List leagueDocumentList = [];
   List seasonsTitleList = [];
@@ -52,7 +60,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
 
   Widget buildTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Text(
         title.toUpperCase(),
         style: kTitleTextStyle,
@@ -93,11 +101,9 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                       return Padding(
                         padding: const EdgeInsets.all(2.0),
                         child: ChoiceChip(
-                          selectedColor:
-                              const Color.fromRGBO(163, 119, 101, 1),
+                          selectedColor: const Color.fromRGBO(163, 119, 101, 1),
                           labelStyle: selectedLeague == index
-                              ? kDefaultTextStyle.copyWith(
-                                  color: Colors.white)
+                              ? kDefaultTextStyle.copyWith(color: Colors.white)
                               : kDefaultTextStyle.copyWith(
                                   color: Colors.grey.shade600),
                           backgroundColor: Colors.grey.shade200,
@@ -132,13 +138,14 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                         children: List<Widget>.generate(
-                      seasonsTitleList.length +1 ,
+                      seasonsTitleList.length + 1,
                       (int index) {
                         if (index == seasonsTitleList.length) {
                           return Padding(
                             padding: const EdgeInsets.all(2.0),
                             child: ChoiceChip(
-                              selectedColor: const Color.fromRGBO(163, 119, 101, 0),
+                              selectedColor:
+                                  const Color.fromRGBO(163, 119, 101, 0),
                               labelStyle: kDefaultTextStyle.copyWith(
                                   color: Colors.white),
                               backgroundColor: Colors.grey.shade200,
@@ -150,9 +157,12 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                               selected: true,
                               onSelected: (bool selected) {
                                 setState(() {
-                                  buildShowDialog(context, 'Season', leagueCollectionRef
-                                      .doc(docID1)
-                                      .collection('season'));
+                                  buildShowDialog(
+                                      context,
+                                      'Season',
+                                      leagueCollectionRef
+                                          .doc(docID1)
+                                          .collection('season'));
                                 });
                               },
                             ),
@@ -207,7 +217,8 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                           return Padding(
                             padding: const EdgeInsets.all(2.0),
                             child: ChoiceChip(
-                              selectedColor: const Color.fromRGBO(163, 119, 101, 0),
+                              selectedColor:
+                                  const Color.fromRGBO(163, 119, 101, 0),
                               labelStyle: kDefaultTextStyle.copyWith(
                                   color: Colors.white),
                               backgroundColor: Colors.grey.shade200,
@@ -219,11 +230,14 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                               selected: true,
                               onSelected: (bool selected) {
                                 setState(() {
-                                  buildShowDialog(context, 'Team', leagueCollectionRef
-                                      .doc(docID1)
-                                      .collection('season')
-                                      .doc(docID2)
-                                      .collection('teams'));
+                                  buildShowDialog(
+                                      context,
+                                      'Team',
+                                      leagueCollectionRef
+                                          .doc(docID1)
+                                          .collection('season')
+                                          .doc(docID2)
+                                          .collection('teams'));
                                 });
                               },
                             ),
@@ -257,6 +271,50 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                 return const Center(child: CircularProgressIndicator());
               },
             ),
+            buildTitle('Profile Picture'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Center(
+                    child: CircleAvatar(
+                      radius: 52,
+                      backgroundColor: kAmahoroColorMaterial,
+                      child: CircleAvatar(
+                        backgroundColor: Colors.white,
+                        backgroundImage: imageBytes!=null ? Image.memory(imageBytes!).image : null,
+                        radius: 48,
+                        child: imageBytes!=null ? Container() : const Icon(
+                          Icons.person,
+                          color: kAmahoroColorMaterial,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                TextButton(
+                  child: Text(
+                    'Add Photo',
+                    style: kDefaultTextStyle,
+                  ),
+                  onPressed: () async {
+                    final ImagePicker _picker = ImagePicker();
+                    pickedImage = await _picker.pickImage(source: ImageSource.camera, imageQuality: 40);
+                    if (pickedImage == null) {
+                      print('fehlerrrrrrrrr');
+                      return;
+                    }
+                    if (pickedImage != null){
+                      imageBytes = await pickedImage?.readAsBytes();
+                      imageFileName = pickedImage?.name;
+                      setState(() {
+                      });
+                    }
+                  },
+                ),
+              ],
+            ),
             buildTitle('First Name'),
             TextField(
               controller: firstNameController,
@@ -289,7 +347,9 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                 ),
               ],
             ),
-            Expanded(child: Container(),),
+            Expanded(
+              child: Container(),
+            ),
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: Row(
@@ -299,34 +359,24 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                   ),
                   TextButton(
                     style: TextButton.styleFrom(
-                      primary: !dateGotSelected &&
-                              firstNameController.text.isEmpty &&
-                              lastNameController.text.isEmpty
-                          ? Colors.grey.shade600
-                          : Colors.white,
-                      backgroundColor: !dateGotSelected &&
-                              firstNameController.text.isEmpty &&
-                              lastNameController.text.isEmpty
-                          ? Colors.grey.shade400
-                          : const Color.fromRGBO(163, 119, 101, 1),
+                      primary: informationIsComplete()
+                          ? Colors.white
+                          : Colors.grey.shade600,
+                      backgroundColor: informationIsComplete()
+                          ? const Color.fromRGBO(163, 119, 101, 1)
+                          : Colors.grey.shade400,
                     ),
                     child: Text(
                       'Submit Player',
                       style: kDefaultTextStyle.copyWith(color: Colors.white),
                     ),
-                    onPressed: !dateGotSelected &&
-                            firstNameController.text.isEmpty &&
-                            lastNameController.text.isEmpty
-                        ? null
-                        : () {
+                    onPressed: informationIsComplete()
+                        ? () {
                             addPlayer();
                             setState(() {
-                              firstNameController.clear();
-                              lastNameController.clear();
-                              selectedDate = DateTime.now();
-                              dateGotSelected = false;
+                              resetValues();
                             });
-                          },
+                          } : null,
                   ),
                   Expanded(
                     child: Container(),
@@ -340,54 +390,74 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
     );
   }
 
-  Future<dynamic> buildShowDialog(BuildContext context, String title, CollectionReference collectionReference) {
-    return showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    TextEditingController tempController =
-                                    TextEditingController();
-                                    return SimpleDialog(
-                                      title: Text('Add a ' + title),
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(20.0),
-                                          child: TextField(
-                                            controller: tempController,
-                                          ),
-                                        ),
-                                        SimpleDialogOption(
-                                          onPressed: () {
-                                            collectionReference
-                                                .add({
-                                              'title':
-                                              tempController
-                                                  .text,
-                                            })
-                                                .then((value) =>
-                                            print("Season Added")).catchError((error) => print("Failed to add user: $error")).then((value) => tempController.dispose());
-                                            Navigator.pop(context);
-                                            setState(() {
-                                              getLeagues().then((value1) => getSeasons(value1).then((value2) => getTeams(value1, value2)));
-                                            });
-                                          },
-                                          child: Text('Add ' + title),
-                                        ),
-                                        SimpleDialogOption(
-                                          onPressed: () {
-                                            tempController.dispose();
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text('Cancel'),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
+  void resetValues() {
+    firstNameController.clear();
+    lastNameController.clear();
+    selectedDate = DateTime.now();
+    dateGotSelected = false;
+    pickedImage = null;
+    imageBytes = null;
   }
 
-  Future<void> addPlayer() {
+  bool informationIsComplete() {
+    return dateGotSelected &&
+                            firstNameController.text.isNotEmpty &&
+                            lastNameController.text.isNotEmpty &&
+                        (imageBytes!=null);
+  }
+
+  Future<dynamic> buildShowDialog(BuildContext context, String title,
+      CollectionReference collectionReference) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController tempController = TextEditingController();
+        return SimpleDialog(
+          title: Text('Add a ' + title),
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: TextField(
+                controller: tempController,
+              ),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                collectionReference
+                    .add({
+                      'title': tempController.text,
+                    })
+                    .then((value) => print("Season Added"))
+                    .catchError((error) => print("Failed to add user: $error"))
+                    .then((value) => tempController.dispose());
+                Navigator.pop(context);
+                setState(() {
+                  getLeagues().then((value1) => getSeasons(value1)
+                      .then((value2) => getTeams(value1, value2)));
+                });
+              },
+              child: Text('Add ' + title),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                tempController.dispose();
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> addPlayer() async {
     print('docID3');
     print(docID3);
+    String firstName = firstNameController.text;
+    String lastName = lastNameController.text;
+    String storageRef = 'players/$docID1/$imageFileName';
+    await storage.ref(storageRef).putData(imageBytes!);
     return leagueCollectionRef
         .doc(docID1)
         .collection('season')
@@ -396,11 +466,15 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
         .doc(docID3)
         .collection('players')
         .add({
-          'firstName': firstNameController.text,
-          'lastName': lastNameController.text,
+          'firstName': firstName,
+          'lastName': lastName,
           'birthday': selectedDate.millisecondsSinceEpoch,
+      'photoURL' : storageRef,
         })
-        .then((value) => print("Player Added"))
+        .then((value) {
+      print("Player Added");
+      resetValues();
+    })
         .catchError((error) => print("Failed to add user: $error"));
   }
 
