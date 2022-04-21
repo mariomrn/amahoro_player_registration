@@ -56,8 +56,8 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> titles = ['Add Player', 'View Player'];
 
   static const List<Widget> _screens = <Widget>[
-    AddPlayerScreen(),
     ViewPlayerScreen(),
+    AddPlayerScreen(),
   ];
 
   void _onItemTapped(int index) {
