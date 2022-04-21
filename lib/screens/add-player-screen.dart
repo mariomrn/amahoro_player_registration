@@ -72,310 +72,309 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(15.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            BasicWidgets.buildTitle('Leagues'),
-            FutureBuilder(
-              future: _futureGetLeagues,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return const Text(
-                    "Something went wrong",
-                  );
-                }
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return Wrap(
-                      children: List<Widget>.generate(
-                    leagueTitleList.length,
-                    (int index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(2.0),
-                        child: ChoiceChip(
-                          selectedColor: const Color.fromRGBO(163, 119, 101, 1),
-                          labelStyle: selectedLeague == index
-                              ? kDefaultTextStyle.copyWith(color: Colors.white)
-                              : kDefaultTextStyle.copyWith(
-                                  color: Colors.grey.shade600),
-                          backgroundColor: Colors.grey.shade200,
-                          label: Text(leagueTitleList[index]['title']),
-                          selected: selectedLeague == index,
-                          onSelected: (bool selected) {
-                            setState(() {
-                              docID1 = leagueDocumentList[index];
-                              getSeasons(docID1);
-                              selectedLeague = index;
-                            });
-                          },
-                        ),
-                      );
-                    },
-                  ).toList());
-                }
-                return const Center(child: CircularProgressIndicator());
-              },
-            ),
-            BasicWidgets.buildTitle('Seasons'),
-            FutureBuilder(
-              future: _futureGetSeasons,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return const Text(
-                    "Something went wrong",
-                  );
-                }
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              BasicWidgets.buildTitle('Leagues'),
+              FutureBuilder(
+                future: _futureGetLeagues,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return const Text(
+                      "Something went wrong",
+                    );
+                  }
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return Wrap(
                         children: List<Widget>.generate(
-                      seasonsTitleList.length + 1,
+                      leagueTitleList.length,
                       (int index) {
-                        if (index == seasonsTitleList.length) {
-                          return Padding(
-                            padding: const EdgeInsets.all(2.0),
-                            child: ChoiceChip(
-                              selectedColor:
-                                  const Color.fromRGBO(163, 119, 101, 0),
-                              labelStyle: kDefaultTextStyle.copyWith(
-                                  color: Colors.white),
-                              backgroundColor: Colors.grey.shade200,
-                              label: const Icon(
-                                Icons.add,
-                                color: Color.fromRGBO(163, 119, 101, 1),
-                                size: 15,
-                              ),
-                              selected: true,
-                              onSelected: (bool selected) {
-                                setState(() {
-                                  buildShowDialog(
-                                      context,
-                                      'Season',
-                                      leagueCollectionRef
-                                          .doc(docID1)
-                                          .collection('season'));
-                                });
-                              },
-                            ),
-                          );
-                        }
                         return Padding(
                           padding: const EdgeInsets.all(2.0),
                           child: ChoiceChip(
-                            selectedColor:
-                                const Color.fromRGBO(163, 119, 101, 1),
-                            labelStyle: selectedSeason == index
-                                ? kDefaultTextStyle.copyWith(
-                                    color: Colors.white)
+                            selectedColor: const Color.fromRGBO(163, 119, 101, 1),
+                            labelStyle: selectedLeague == index
+                                ? kDefaultTextStyle.copyWith(color: Colors.white)
                                 : kDefaultTextStyle.copyWith(
                                     color: Colors.grey.shade600),
                             backgroundColor: Colors.grey.shade200,
-                            label: Text(seasonsTitleList[index]['title']),
-                            selected: selectedSeason == index,
+                            label: Text(leagueTitleList[index]['title']),
+                            selected: selectedLeague == index,
                             onSelected: (bool selected) {
                               setState(() {
-                                docID2 = seasonsDocumentList[index];
-                                getTeams(docID1, docID2);
-                                selectedSeason = index;
+                                docID1 = leagueDocumentList[index];
+                                getSeasons(docID1);
+                                selectedLeague = index;
                               });
                             },
                           ),
                         );
                       },
-                    ).toList()),
-                  );
-                }
-                return const Center(child: CircularProgressIndicator());
-              },
-            ),
-            BasicWidgets.buildTitle('Teams'),
-            FutureBuilder(
-              future: _futureGetTeams,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return const Text(
-                    "Something went wrong",
-                  );
-                }
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                        children: List<Widget>.generate(
-                      teamsTitleList.length + 1,
-                      (int index) {
-                        if (index == teamsTitleList.length) {
+                    ).toList());
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
+              BasicWidgets.buildTitle('Seasons'),
+              FutureBuilder(
+                future: _futureGetSeasons,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return const Text(
+                      "Something went wrong",
+                    );
+                  }
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                          children: List<Widget>.generate(
+                        seasonsTitleList.length + 1,
+                        (int index) {
+                          if (index == seasonsTitleList.length) {
+                            return Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: ChoiceChip(
+                                selectedColor:
+                                    const Color.fromRGBO(163, 119, 101, 0),
+                                labelStyle: kDefaultTextStyle.copyWith(
+                                    color: Colors.white),
+                                backgroundColor: Colors.grey.shade200,
+                                label: const Icon(
+                                  Icons.add,
+                                  color: Color.fromRGBO(163, 119, 101, 1),
+                                  size: 15,
+                                ),
+                                selected: true,
+                                onSelected: (bool selected) {
+                                  setState(() {
+                                    buildShowDialog(
+                                        context,
+                                        'Season',
+                                        leagueCollectionRef
+                                            .doc(docID1)
+                                            .collection('season'));
+                                  });
+                                },
+                              ),
+                            );
+                          }
                           return Padding(
                             padding: const EdgeInsets.all(2.0),
                             child: ChoiceChip(
                               selectedColor:
-                                  const Color.fromRGBO(163, 119, 101, 0),
-                              labelStyle: kDefaultTextStyle.copyWith(
-                                  color: Colors.white),
+                                  const Color.fromRGBO(163, 119, 101, 1),
+                              labelStyle: selectedSeason == index
+                                  ? kDefaultTextStyle.copyWith(
+                                      color: Colors.white)
+                                  : kDefaultTextStyle.copyWith(
+                                      color: Colors.grey.shade600),
                               backgroundColor: Colors.grey.shade200,
-                              label: const Icon(
-                                Icons.add,
-                                color: Color.fromRGBO(163, 119, 101, 1),
-                                size: 15,
-                              ),
-                              selected: true,
+                              label: Text(seasonsTitleList[index]['title']),
+                              selected: selectedSeason == index,
                               onSelected: (bool selected) {
                                 setState(() {
-                                  buildShowDialog(
-                                      context,
-                                      'Team',
-                                      leagueCollectionRef
-                                          .doc(docID1)
-                                          .collection('season')
-                                          .doc(docID2)
-                                          .collection('teams'));
+                                  docID2 = seasonsDocumentList[index];
+                                  getTeams(docID1, docID2);
+                                  selectedSeason = index;
                                 });
                               },
                             ),
                           );
-                        }
-                        return Padding(
-                          padding: const EdgeInsets.all(2.0),
-                          child: ChoiceChip(
-                            selectedColor:
-                                const Color.fromRGBO(163, 119, 101, 1),
-                            labelStyle: selectedTeam == index
-                                ? kDefaultTextStyle.copyWith(
-                                    color: Colors.white)
-                                : kDefaultTextStyle.copyWith(
-                                    color: Colors.grey.shade600),
-                            backgroundColor: Colors.grey.shade200,
-                            label: Text(teamsTitleList[index]['title']),
-                            selected: selectedTeam == index,
-                            onSelected: (bool selected) {
-                              setState(() {
-                                docID3 = teamsDocumentList[selectedTeam];
-                                selectedTeam = index;
-                              });
-                            },
-                          ),
-                        );
-                      },
-                    ).toList()),
-                  );
-                }
-                return const Center(child: CircularProgressIndicator());
-              },
-            ),
-            BasicWidgets.buildTitle('Profile Picture'),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Center(
-                    child: CircleAvatar(
-                      radius: 52,
-                      backgroundColor: kAmahoroColorMaterial,
+                        },
+                      ).toList()),
+                    );
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
+              BasicWidgets.buildTitle('Teams'),
+              FutureBuilder(
+                future: _futureGetTeams,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return const Text(
+                      "Something went wrong",
+                    );
+                  }
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                          children: List<Widget>.generate(
+                        teamsTitleList.length + 1,
+                        (int index) {
+                          if (index == teamsTitleList.length) {
+                            return Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: ChoiceChip(
+                                selectedColor:
+                                    const Color.fromRGBO(163, 119, 101, 0),
+                                labelStyle: kDefaultTextStyle.copyWith(
+                                    color: Colors.white),
+                                backgroundColor: Colors.grey.shade200,
+                                label: const Icon(
+                                  Icons.add,
+                                  color: Color.fromRGBO(163, 119, 101, 1),
+                                  size: 15,
+                                ),
+                                selected: true,
+                                onSelected: (bool selected) {
+                                  setState(() {
+                                    buildShowDialog(
+                                        context,
+                                        'Team',
+                                        leagueCollectionRef
+                                            .doc(docID1)
+                                            .collection('season')
+                                            .doc(docID2)
+                                            .collection('teams'));
+                                  });
+                                },
+                              ),
+                            );
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: ChoiceChip(
+                              selectedColor:
+                                  const Color.fromRGBO(163, 119, 101, 1),
+                              labelStyle: selectedTeam == index
+                                  ? kDefaultTextStyle.copyWith(
+                                      color: Colors.white)
+                                  : kDefaultTextStyle.copyWith(
+                                      color: Colors.grey.shade600),
+                              backgroundColor: Colors.grey.shade200,
+                              label: Text(teamsTitleList[index]['title']),
+                              selected: selectedTeam == index,
+                              onSelected: (bool selected) {
+                                setState(() {
+                                  docID3 = teamsDocumentList[selectedTeam];
+                                  selectedTeam = index;
+                                });
+                              },
+                            ),
+                          );
+                        },
+                      ).toList()),
+                    );
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
+              BasicWidgets.buildTitle('Profile Picture'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Center(
                       child: CircleAvatar(
-                        backgroundColor: Colors.white,
-                        backgroundImage: imageBytes!=null ? Image.memory(imageBytes!).image : null,
-                        radius: 48,
-                        child: imageBytes!=null ? Container() : const Icon(
-                          Icons.person,
-                          color: kAmahoroColorMaterial,
+                        radius: 52,
+                        backgroundColor: kAmahoroColorMaterial,
+                        child: CircleAvatar(
+                          backgroundColor: Colors.white,
+                          backgroundImage: imageBytes!=null ? Image.memory(imageBytes!).image : null,
+                          radius: 48,
+                          child: imageBytes!=null ? Container() : const Icon(
+                            Icons.person,
+                            color: kAmahoroColorMaterial,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                TextButton(
-                  child: Text(
-                    'Add Photo',
-                    style: kDefaultTextStyle,
-                  ),
-                  onPressed: () async {
-                    final ImagePicker _picker = ImagePicker();
-                    pickedImage = await _picker.pickImage(source: ImageSource.camera, imageQuality: 40);
-                    if (pickedImage == null) {
-                      print('fehlerrrrrrrrr');
-                      return;
-                    }
-                    if (pickedImage != null){
-                      imageBytes = await pickedImage?.readAsBytes();
-                      imageFileName = pickedImage?.name;
-                      setState(() {
-                      });
-                    }
-                  },
-                ),
-              ],
-            ),
-            BasicWidgets.buildTitle('First Name'),
-            TextField(
-              controller: firstNameController,
-            ),
-            BasicWidgets.buildTitle('Last Name'),
-            TextField(
-              controller: lastNameController,
-            ),
-            BasicWidgets.buildTitle('Date Of Birth'),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  dateGotSelected
-                      ? DateFormat('dd.MM.yyyy').format(selectedDate)
-                      : 'no date selected',
-                  style: kDefaultTextStyle.copyWith(
-                      color: dateGotSelected
-                          ? Colors.grey.shade900
-                          : Colors.grey.shade500),
-                ),
-                TextButton(
-                  child: Text(
-                    'Choose Birthday',
-                    style: kDefaultTextStyle,
-                  ),
-                  onPressed: () {
-                    _selectDate(context);
-                  },
-                ),
-              ],
-            ),
-            Expanded(
-              child: Container(),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(),
-                  ),
                   TextButton(
-                    style: TextButton.styleFrom(
-                      primary: informationIsComplete()
-                          ? Colors.white
-                          : Colors.grey.shade600,
-                      backgroundColor: informationIsComplete()
-                          ? const Color.fromRGBO(163, 119, 101, 1)
-                          : Colors.grey.shade400,
-                    ),
                     child: Text(
-                      'Submit Player',
-                      style: kDefaultTextStyle.copyWith(color: Colors.white),
+                      'Add Photo',
+                      style: kDefaultTextStyle,
                     ),
-                    onPressed: informationIsComplete()
-                        ? () {
-                            addPlayer();
-                            setState(() {
-                              resetValues();
-                            });
-                          } : null,
-                  ),
-                  Expanded(
-                    child: Container(),
+                    onPressed: () async {
+                      final ImagePicker _picker = ImagePicker();
+                      pickedImage = await _picker.pickImage(source: ImageSource.camera, imageQuality: 40);
+                      if (pickedImage == null) {
+                        print('fehlerrrrrrrrr');
+                        return;
+                      }
+                      if (pickedImage != null){
+                        imageBytes = await pickedImage?.readAsBytes();
+                        imageFileName = pickedImage?.name;
+                        setState(() {
+                        });
+                      }
+                    },
                   ),
                 ],
               ),
-            ),
-          ],
+              BasicWidgets.buildTitle('First Name'),
+              TextField(
+                controller: firstNameController,
+              ),
+              BasicWidgets.buildTitle('Last Name'),
+              TextField(
+                controller: lastNameController,
+              ),
+              BasicWidgets.buildTitle('Date Of Birth'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    dateGotSelected
+                        ? DateFormat('dd.MM.yyyy').format(selectedDate)
+                        : 'no date selected',
+                    style: kDefaultTextStyle.copyWith(
+                        color: dateGotSelected
+                            ? Colors.grey.shade900
+                            : Colors.grey.shade500),
+                  ),
+                  TextButton(
+                    child: Text(
+                      'Choose Birthday',
+                      style: kDefaultTextStyle,
+                    ),
+                    onPressed: () {
+                      _selectDate(context);
+                    },
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 30),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(),
+                    ),
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        primary: informationIsComplete()
+                            ? Colors.white
+                            : Colors.grey.shade600,
+                        backgroundColor: informationIsComplete()
+                            ? const Color.fromRGBO(163, 119, 101, 1)
+                            : Colors.grey.shade400,
+                      ),
+                      child: Text(
+                        'Submit Player',
+                        style: kDefaultTextStyle.copyWith(color: Colors.white),
+                      ),
+                      onPressed: informationIsComplete()
+                          ? () {
+                              addPlayer();
+                              setState(() {
+                                resetValues();
+                              });
+                            } : null,
+                    ),
+                    Expanded(
+                      child: Container(),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,10 +1,13 @@
+import 'dart:html' as html;
+import 'dart:typed_data';
+
 import 'package:amahoro_player_registration/screens/widgets/basicWidgets.dart';
 import 'package:amahoro_player_registration/theme/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
+import 'package:pdf/widgets.dart' as pw;
 import '../theme/textStyles.dart';
 
 class ViewPlayerScreen extends StatefulWidget {
@@ -39,6 +42,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
   late Future _futureGetSeasons;
   late Future _futureGetTeams;
   List playerList = [];
+  List<Widget> playerCardList = [];
 
   @override
   void initState() {
@@ -168,7 +172,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
       shrinkWrap: true,
       separatorBuilder: (BuildContext context, int index) => const Divider(),
       itemBuilder: (BuildContext context, int index) {
-        return Container(
+        Widget playerCard = Container(
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(
@@ -185,9 +189,9 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                   flex: 2,
                   child: Center(
                       child: Text(
-                    leagueTitleList[selectedLeague]['title'].toUpperCase(),
-                    style: kPlayerCardLeagueTS,
-                  ))), //leagueTitleList[selectedLeague]['title']
+                        leagueTitleList[selectedLeague]['title'].toUpperCase(),
+                        style: kPlayerCardLeagueTS,
+                      ))), //leagueTitleList[selectedLeague]['title']
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -196,10 +200,10 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                     children: [
                       Text(teamsTitleList[selectedTeam]['title'],
                           style:
-                              kPlayerCardSubtitleTS), //teamsTitleList[selectedTeam]['title']
+                          kPlayerCardSubtitleTS), //teamsTitleList[selectedTeam]['title']
                       Text(seasonsTitleList[selectedSeason]['title'],
                           style:
-                              kPlayerCardSubtitleTS), //seasonsTitleList[selectedSeason]['title']
+                          kPlayerCardSubtitleTS), //seasonsTitleList[selectedSeason]['title']
                     ],
                   ),
                 ),
@@ -222,7 +226,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                                   DateTime.fromMillisecondsSinceEpoch(
                                       dataList[index]["birthday"])),
                               style:
-                                  kPlayerCardTextTS), //dataList[index]["birthday"]
+                              kPlayerCardTextTS), //dataList[index]["birthday"]
                         ],
                       ),
                     ),
@@ -266,6 +270,8 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
             ],
           ),
         );
+        playerCardList.add(playerCard);
+        return playerCard;
       });
 
   @override
@@ -432,10 +438,61 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                   return const Center(child: CircularProgressIndicator());
                 },
               ),
+
+
+
+
+              TextButton(
+                style: TextButton.styleFrom(
+                  primary: playerCardList.isNotEmpty
+                      ? Colors.white
+                      : Colors.grey.shade600,
+                  backgroundColor: playerCardList.isNotEmpty
+                      ? const Color.fromRGBO(163, 119, 101, 1)
+                      : Colors.grey.shade400,
+                ),
+                child: Text(
+                  'Export as PDF',
+                  style: kDefaultTextStyle.copyWith(color: Colors.white),
+                ),
+                onPressed:  () async {
+                  await createPDF();
+                  anchor.click();
+                },
+              ),
             ],
           ),
         ),
       ),
     );
   }
+
+  final pdf = pw.Document();
+  var anchor;
+
+  savePDF() async {
+    Uint8List pdfInBytes = await pdf.save();
+    final blob = html.Blob([pdfInBytes], 'application/pdf');
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    anchor = html.document.createElement('a') as html.AnchorElement
+      ..href = url
+      ..style.display = 'none'
+      ..download = 'pdf.pdf';
+    html.document.body?.children.add(anchor);
+  }
+
+
+  createPDF() async {
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) => pw.Column(
+          children: [
+            pw.Text('Hello'),
+          ],
+        ),
+      ),
+    );
+    savePDF();
+  }
+
 }

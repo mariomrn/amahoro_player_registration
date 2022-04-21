@@ -41,6 +41,9 @@ dependencies:
   firebase_storage: ^10.2.12
   file_picker: ^4.5.1
   image_picker: ^0.8.5
+  pdf: ^3.7.4
+  path_provider: ^2.0.9
+  open_document: ^1.0.4
 
 dev_dependencies:
   flutter_test:
