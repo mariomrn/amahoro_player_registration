@@ -27,7 +27,6 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
   bool dateGotSelected = false;
   XFile? pickedImage;
   Uint8List? imageBytes;
-  String? imageFileName;
   List leagueTitleList = [];
   List leagueDocumentList = [];
   List seasonsTitleList = [];
@@ -294,12 +293,10 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                       final ImagePicker _picker = ImagePicker();
                       pickedImage = await _picker.pickImage(source: ImageSource.camera, imageQuality: 40);
                       if (pickedImage == null) {
-                        print('fehlerrrrrrrrr');
                         return;
                       }
                       if (pickedImage != null){
                         imageBytes = await pickedImage?.readAsBytes();
-                        imageFileName = pickedImage?.name;
                         setState(() {
                         });
                       }
@@ -446,7 +443,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
     print(docID3);
     String firstName = firstNameController.text;
     String lastName = lastNameController.text;
-    String storageRef = 'players/$docID1/$imageFileName';
+    String storageRef = 'players/$docID1/${firstName+lastName+selectedDate.millisecondsSinceEpoch.toString()}';
     await storage.ref(storageRef).putData(imageBytes!);
     return leagueCollectionRef
         .doc(docID1)
