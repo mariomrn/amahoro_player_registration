@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:amahoro_player_registration/screens/widgets/basicWidgets.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:amahoro_player_registration/theme/colors.dart';
 import 'package:flutter/material.dart';
@@ -58,16 +59,6 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
     }
   }
 
-  Widget buildTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Text(
-        title.toUpperCase(),
-        style: kTitleTextStyle,
-      ),
-    );
-  }
-
   @override
   void initState() {
     super.initState();
@@ -84,7 +75,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            buildTitle('Leagues'),
+            BasicWidgets.buildTitle('Leagues'),
             FutureBuilder(
               future: _futureGetLeagues,
               builder: (context, snapshot) {
@@ -124,7 +115,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                 return const Center(child: CircularProgressIndicator());
               },
             ),
-            buildTitle('Seasons'),
+            BasicWidgets.buildTitle('Seasons'),
             FutureBuilder(
               future: _futureGetSeasons,
               builder: (context, snapshot) {
@@ -197,7 +188,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                 return const Center(child: CircularProgressIndicator());
               },
             ),
-            buildTitle('Teams'),
+            BasicWidgets.buildTitle('Teams'),
             FutureBuilder(
               future: _futureGetTeams,
               builder: (context, snapshot) {
@@ -271,7 +262,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                 return const Center(child: CircularProgressIndicator());
               },
             ),
-            buildTitle('Profile Picture'),
+            BasicWidgets.buildTitle('Profile Picture'),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -315,15 +306,15 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                 ),
               ],
             ),
-            buildTitle('First Name'),
+            BasicWidgets.buildTitle('First Name'),
             TextField(
               controller: firstNameController,
             ),
-            buildTitle('Last Name'),
+            BasicWidgets.buildTitle('Last Name'),
             TextField(
               controller: lastNameController,
             ),
-            buildTitle('Date Of Birth'),
+            BasicWidgets.buildTitle('Date Of Birth'),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -469,7 +460,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
           'firstName': firstName,
           'lastName': lastName,
           'birthday': selectedDate.millisecondsSinceEpoch,
-      'photoURL' : storageRef,
+          'photoURL' : storageRef,
         })
         .then((value) {
       print("Player Added");
