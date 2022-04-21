@@ -403,7 +403,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
     return dateGotSelected &&
                             firstNameController.text.isNotEmpty &&
                             lastNameController.text.isNotEmpty &&
-                        (imageBytes!=null);
+                        (imageBytes!=null) && docID3.length > 1;
   }
 
   Future<dynamic> buildShowDialog(BuildContext context, String title,
@@ -480,9 +480,9 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
 
   Future getLeagues() async {
     try {
+      leagueDocumentList.clear();
+      leagueTitleList.clear();
       await leagueCollectionRef.get().then((querySnapshot) {
-        leagueDocumentList.clear();
-        leagueTitleList.clear();
         for (var result in querySnapshot.docs) {
           leagueDocumentList.add(result.id);
           leagueTitleList.add(result.data());
@@ -498,13 +498,15 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
 
   Future getSeasons(String docID) async {
     try {
+      seasonsTitleList.clear();
+      seasonsDocumentList.clear();
+      teamsTitleList.clear();
+      teamsDocumentList.clear();
       await leagueCollectionRef
           .doc(docID)
           .collection('season')
           .get()
           .then((querySnapshot) {
-        seasonsTitleList.clear();
-        seasonsDocumentList.clear();
         for (var result in querySnapshot.docs) {
           seasonsTitleList.add(result.data());
           seasonsDocumentList.add(result.id);
@@ -523,6 +525,9 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
 
   Future getTeams(String docID1, String docID2) async {
     try {
+      teamsTitleList.clear();
+      teamsDocumentList.clear();
+      docID3 = '';
       await leagueCollectionRef
           .doc(docID1)
           .collection('season')
@@ -530,15 +535,15 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
           .collection('teams')
           .get()
           .then((querySnapshot) {
-        teamsTitleList.clear();
-        teamsDocumentList.clear();
         for (var result in querySnapshot.docs) {
           teamsTitleList.add(result.data());
           teamsDocumentList.add(result.id);
         }
       });
       setState(() {
-        docID3 = teamsDocumentList[selectedTeam];
+        if(teamsDocumentList.isNotEmpty) {
+          docID3 = teamsDocumentList[selectedTeam];
+        }
       });
       return teamsTitleList;
     } catch (e) {
