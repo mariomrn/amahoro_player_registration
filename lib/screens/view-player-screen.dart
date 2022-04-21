@@ -1,6 +1,5 @@
 import 'dart:html' as html;
 import 'dart:typed_data';
-
 import 'package:amahoro_player_registration/screens/widgets/basicWidgets.dart';
 import 'package:amahoro_player_registration/theme/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/widgets.dart' as pw;
 import '../theme/textStyles.dart';
+import 'package:screenshot/screenshot.dart';
 
 class ViewPlayerScreen extends StatefulWidget {
   const ViewPlayerScreen({Key? key}) : super(key: key);
@@ -189,9 +189,9 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                   flex: 2,
                   child: Center(
                       child: Text(
-                        leagueTitleList[selectedLeague]['title'].toUpperCase(),
-                        style: kPlayerCardLeagueTS,
-                      ))), //leagueTitleList[selectedLeague]['title']
+                    leagueTitleList[selectedLeague]['title'].toUpperCase(),
+                    style: kPlayerCardLeagueTS,
+                  ))), //leagueTitleList[selectedLeague]['title']
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -200,10 +200,10 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                     children: [
                       Text(teamsTitleList[selectedTeam]['title'],
                           style:
-                          kPlayerCardSubtitleTS), //teamsTitleList[selectedTeam]['title']
+                              kPlayerCardSubtitleTS), //teamsTitleList[selectedTeam]['title']
                       Text(seasonsTitleList[selectedSeason]['title'],
                           style:
-                          kPlayerCardSubtitleTS), //seasonsTitleList[selectedSeason]['title']
+                              kPlayerCardSubtitleTS), //seasonsTitleList[selectedSeason]['title']
                     ],
                   ),
                 ),
@@ -226,7 +226,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                                   DateTime.fromMillisecondsSinceEpoch(
                                       dataList[index]["birthday"])),
                               style:
-                              kPlayerCardTextTS), //dataList[index]["birthday"]
+                                  kPlayerCardTextTS), //dataList[index]["birthday"]
                         ],
                       ),
                     ),
@@ -248,7 +248,8 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                                 ),
                               );
                             }
-                            if (snapshot.connectionState == ConnectionState.done) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
                               return CircleAvatar(
                                 backgroundColor: Colors.white,
                                 backgroundImage: Image.network(
@@ -438,10 +439,6 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                   return const Center(child: CircularProgressIndicator());
                 },
               ),
-
-
-
-
               TextButton(
                 style: TextButton.styleFrom(
                   primary: playerCardList.isNotEmpty
@@ -455,9 +452,8 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                   'Export as PDF',
                   style: kDefaultTextStyle.copyWith(color: Colors.white),
                 ),
-                onPressed:  () async {
+                onPressed: () async {
                   await createPDF();
-                  anchor.click();
                 },
               ),
             ],
@@ -481,18 +477,29 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
     html.document.body?.children.add(anchor);
   }
 
-
   createPDF() async {
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) => pw.Column(
-          children: [
-            pw.Text('Hello'),
-          ],
-        ),
-      ),
-    );
-    savePDF();
+    ScreenshotController scontroller = ScreenshotController();
+    final pdf = pw.Document();
+    scontroller
+        .captureFromWidget(Container(
+            padding: const EdgeInsets.all(30.0),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.blueAccent, width: 5.0),
+              color: Colors.redAccent,
+            ),
+            child: Text("This is an invisible widget")))
+        .then((capturedImage) {
+          final image = pw.MemoryImage(
+            capturedImage,
+          );
+          print(image);
+          pdf.addPage(pw.Page(build: (pw.Context context) {
+            return pw.Center(
+              child: pw.Image(image),
+            ); // Center
+          }));
+        })
+        .then((value) => savePDF())
+        .then((value) => anchor.click());
   }
-
 }

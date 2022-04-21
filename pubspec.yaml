@@ -44,6 +44,7 @@ dependencies:
   pdf: ^3.7.4
   path_provider: ^2.0.9
   open_document: ^1.0.4
+  screenshot: ^1.2.3
 
 dev_dependencies:
   flutter_test:
