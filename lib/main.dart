@@ -56,8 +56,8 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> titles = ['Add Player', 'View Player'];
 
   static const List<Widget> _screens = <Widget>[
-    ViewPlayerScreen(),
     AddPlayerScreen(),
+    ViewPlayerScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -69,7 +69,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(titles[_selectedIndex], style: kDefaultTextStyle.copyWith(color: Colors.white),),
       ),
