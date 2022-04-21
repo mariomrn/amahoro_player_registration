@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+
 
 class ViewPlayerScreen extends StatefulWidget {
   const ViewPlayerScreen({Key? key}) : super(key: key);
@@ -77,20 +78,16 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
             // ),
             ElevatedButton(
                 onPressed: () async {
-                  final result = await FilePicker.platform.pickFiles(
-                    allowMultiple: false,
-                    type: FileType.custom,
-                    allowedExtensions: ['png', 'jpg'],
-                  );
+                  final ImagePicker _picker = ImagePicker();
+                  final XFile? result = await _picker.pickImage(source: ImageSource.camera, imageQuality: 40);
                   if (result == null) {
                     print('fehlerrrrrrrrr');
                     return;
-                  }
-                  if (result != null && result.files.isNotEmpty) {
-                    final fileBytes = result.files.first.bytes;
-                    final fileName = result.files.first.name;
+                  } else {
+                    final fileBytes = await result.readAsBytes();
+                    final fileName = result.name;
                     // upload file
-                    await storage.ref('players/$fileName').putData(fileBytes!);
+                    await storage.ref('players/$fileName').putData(fileBytes);
                   }
                 },
                 child: Text('Upload a file')),
