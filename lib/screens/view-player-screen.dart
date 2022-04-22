@@ -1,11 +1,15 @@
+import 'dart:html' as html;
+import 'dart:typed_data';
 import 'package:amahoro_player_registration/screens/widgets/basicWidgets.dart';
 import 'package:amahoro_player_registration/theme/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 import '../theme/textStyles.dart';
+import 'package:screenshot/screenshot.dart';
 
 class ViewPlayerScreen extends StatefulWidget {
   const ViewPlayerScreen({Key? key}) : super(key: key);
@@ -37,6 +41,8 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
   String docID3 = "";
   late Future _futureGetInitial;
   List playerList = [];
+  List<Widget> playerCardList = [];
+  ScreenshotController scontroller = ScreenshotController();
 
   @override
   void initState() {
@@ -162,6 +168,9 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
     return downloadURL;
   }
 
+  //before calling buildItems screenshotcontroller list should be emptied
+  List<ScreenshotController> screenshotControllerList = [];
+
   Widget buildItems(dataList) => ListView.separated(
       padding: const EdgeInsets.all(8),
       physics: const NeverScrollableScrollPhysics(),
@@ -170,104 +179,112 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
       shrinkWrap: true,
       separatorBuilder: (BuildContext context, int index) => const Divider(),
       itemBuilder: (BuildContext context, int index) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(
-              color: kAmahoroColorMaterial,
-              width: 10,
-            ),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          width: 430,
-          height: 260,
-          child: Column(
-            children: [
-              Expanded(
-                  flex: 2,
-                  child: Center(
-                      child: Text(
-                    leagueTitleList[selectedLeague]['title'].toUpperCase(),
-                    style: kPlayerCardLeagueTS,
-                  ))), //leagueTitleList[selectedLeague]['title']
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(teamsTitleList[selectedTeam]['title'],
-                          style:
-                              kPlayerCardSubtitleTS), //teamsTitleList[selectedTeam]['title']
-                      Text(seasonsTitleList[selectedSeason]['title'],
-                          style:
-                              kPlayerCardSubtitleTS), //seasonsTitleList[selectedSeason]['title']
-                    ],
-                  ),
+        ScreenshotController screenshotController = ScreenshotController();
+        Widget playerCard = Screenshot(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(
+                  color: kAmahoroColorMaterial,
+                  width: 10,
                 ),
+                borderRadius: BorderRadius.circular(20),
               ),
-              Expanded(
-                flex: 5,
-                child: Row(
-                  children: [
-                    Expanded(
+              width: 430,
+              height: 260,
+              child: Column(
+                children: [
+                  Expanded(
                       flex: 2,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      child: Center(
+                          child: Text(
+                        leagueTitleList[selectedLeague]['title'].toUpperCase(),
+                        style: kPlayerCardLeagueTS,
+                      ))), //leagueTitleList[selectedLeague]['title']
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(dataList[index]["firstName"],
-                              style: kPlayerCardTextTS),
-                          Text(dataList[index]["lastName"],
-                              style: kPlayerCardTextTS),
-                          Text(
-                              DateFormat('dd.MM.yyyy').format(
-                                  DateTime.fromMillisecondsSinceEpoch(
-                                      dataList[index]["birthday"])),
+                          Text(teamsTitleList[selectedTeam]['title'],
                               style:
-                                  kPlayerCardTextTS), //dataList[index]["birthday"]
+                                  kPlayerCardSubtitleTS), //teamsTitleList[selectedTeam]['title']
+                          Text(seasonsTitleList[selectedSeason]['title'],
+                              style:
+                                  kPlayerCardSubtitleTS), //seasonsTitleList[selectedSeason]['title']
                         ],
                       ),
                     ),
-                    Expanded(
-                      child: CircleAvatar(
-                        radius: 54,
-                        backgroundColor: kAmahoroColorMaterial,
-                        child: FutureBuilder(
-                          future: downloadURL(dataList[index]["photoURL"]),
-                          builder: (context, AsyncSnapshot<String> snapshot) {
-                            if (snapshot.hasError) {
-                              return const CircleAvatar(
-                                backgroundColor: Colors.white,
-                                //backgroundImage: imageBytes!=null ? Image.memory(imageBytes!).image : null,
-                                radius: 48,
-                                child: Icon(
-                                  Icons.person,
-                                  color: kAmahoroColorMaterial,
-                                ),
-                              );
-                            }
-                            if (snapshot.connectionState == ConnectionState.done) {
-                              return CircleAvatar(
-                                backgroundColor: Colors.white,
-                                backgroundImage: Image.network(
-                                  snapshot.data!,
-                                  fit: BoxFit.cover,
-                                ).image,
-                                radius: 48,
-                              );
-                            }
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          },
+                  ),
+                  Expanded(
+                    flex: 5,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text(dataList[index]["firstName"],
+                                  style: kPlayerCardTextTS),
+                              Text(dataList[index]["lastName"],
+                                  style: kPlayerCardTextTS),
+                              Text(
+                                  DateFormat('dd.MM.yyyy').format(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                          dataList[index]["birthday"])),
+                                  style:
+                                      kPlayerCardTextTS), //dataList[index]["birthday"]
+                            ],
+                          ),
                         ),
-                      ),
+                        Expanded(
+                          child: CircleAvatar(
+                            radius: 54,
+                            backgroundColor: kAmahoroColorMaterial,
+                            child: FutureBuilder(
+                              future: downloadURL(dataList[index]["photoURL"]),
+                              builder:
+                                  (context, AsyncSnapshot<String> snapshot) {
+                                if (snapshot.hasError) {
+                                  return const CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    //backgroundImage: imageBytes!=null ? Image.memory(imageBytes!).image : null,
+                                    radius: 48,
+                                    child: Icon(
+                                      Icons.person,
+                                      color: kAmahoroColorMaterial,
+                                    ),
+                                  );
+                                }
+                                if (snapshot.connectionState ==
+                                    ConnectionState.done) {
+                                  return CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    backgroundImage: Image.network(
+                                      snapshot.data!,
+                                      fit: BoxFit.cover,
+                                    ).image,
+                                    radius: 48,
+                                  );
+                                }
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        );
+            ),
+            controller: screenshotController);
+        playerCardList.add(playerCard);
+        screenshotControllerList.add(screenshotController);
+        return playerCard;
       });
 
   @override
@@ -418,6 +435,28 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                 },
               ),
               BasicWidgets.buildTitle('Members'),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      primary: playerCardList.isNotEmpty
+                          ? Colors.white
+                          : Colors.grey.shade600,
+                      backgroundColor: playerCardList.isNotEmpty
+                          ? const Color.fromRGBO(163, 119, 101, 1)
+                          : Colors.grey.shade400,
+                    ),
+                    child: Text(
+                      'Export as PDF :-)',
+                      style: kDefaultTextStyle.copyWith(color: Colors.white),
+                    ),
+                    onPressed: () async {
+                      await createPDF();
+                    },
+                  ),
+                ),
+              ),
               FutureBuilder(
                 future: getData(),
                 builder: (context, snapshot) {
@@ -427,6 +466,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                     );
                   }
                   if (snapshot.connectionState == ConnectionState.done) {
+                    screenshotControllerList.clear();
                     return playerList.isEmpty
                         ? Text('No Player found')
                         : buildItems(playerList);
@@ -439,5 +479,79 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
         ),
       ),
     );
+  }
+
+  final pdf = pw.Document();
+  var anchor;
+
+  savePDF() async {
+    Uint8List pdfInBytes = await pdf.save();
+    final blob = html.Blob([pdfInBytes], 'application/pdf');
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    anchor = html.document.createElement('a') as html.AnchorElement
+      ..href = url
+      ..style.display = 'none'
+      ..download = 'pdf.pdf';
+    html.document.body?.children.add(anchor);
+  }
+
+  List<Uint8List> playerCardImages = [];
+  capturePlayerCards() async {
+    playerCardImages.clear();
+    for (ScreenshotController screenshotController
+        in screenshotControllerList) {
+      await screenshotController
+          .capture()
+          .then((value) => playerCardImages.add(value!));
+    }
+    print('length ' + playerCardImages.length.toString());
+    return playerCardImages;
+  }
+
+  createPDF() async {
+    await capturePlayerCards()
+        .then(
+          (capturedImage) {
+            pdf.addPage(
+              pw.Page(
+                pageFormat: PdfPageFormat.a4,
+                build: (context) {
+                  return pw.Column(
+                    children: buildRows(),
+                  );
+                },
+              ),
+            );
+          },
+        )
+        .then((value) => savePDF())
+        .then((value) => anchor.click());
+  }
+
+  List<pw.Row> buildRows() {
+    List<pw.Row> playercardRows = [];
+    List<Uint8List> playerCardtemp = [];
+    for (var playerCardImage in playerCardImages) {
+      playerCardtemp.add(playerCardImage);
+      if (playerCardtemp.length > 1) {
+        playercardRows.add(
+          pw.Row(
+            children: [
+              for (var playercardimage in playerCardtemp)
+                pw.Container(
+                  height: 100,
+                  width: 250,
+                  child: pw.Image(
+                    pw.MemoryImage(playercardimage),
+                    fit: pw.BoxFit.contain,
+                  ),
+                ),
+            ],
+          ),
+        );
+        playerCardtemp.clear();
+      }
+    }
+    return playercardRows;
   }
 }
