@@ -167,6 +167,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
     return downloadURL;
   }
 
+  //before calling buildItems screenshotcontroller list should be emptied
   List<ScreenshotController> screenshotControllerList = [];
 
   Widget buildItems(dataList) => ListView.separated(
@@ -177,105 +178,108 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
       separatorBuilder: (BuildContext context, int index) => const Divider(),
       itemBuilder: (BuildContext context, int index) {
         ScreenshotController screenshotController = ScreenshotController();
-        Widget playerCard = Screenshot(child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(
-              color: kAmahoroColorMaterial,
-              width: 10,
-            ),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          width: 430,
-          height: 260,
-          child: Column(
-            children: [
-              Expanded(
-                  flex: 2,
-                  child: Center(
-                      child: Text(
+        Widget playerCard = Screenshot(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(
+                  color: kAmahoroColorMaterial,
+                  width: 10,
+                ),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              width: 430,
+              height: 260,
+              child: Column(
+                children: [
+                  Expanded(
+                      flex: 2,
+                      child: Center(
+                          child: Text(
                         leagueTitleList[selectedLeague]['title'].toUpperCase(),
                         style: kPlayerCardLeagueTS,
                       ))), //leagueTitleList[selectedLeague]['title']
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(teamsTitleList[selectedTeam]['title'],
-                          style:
-                          kPlayerCardSubtitleTS), //teamsTitleList[selectedTeam]['title']
-                      Text(seasonsTitleList[selectedSeason]['title'],
-                          style:
-                          kPlayerCardSubtitleTS), //seasonsTitleList[selectedSeason]['title']
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 5,
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(dataList[index]["firstName"],
-                              style: kPlayerCardTextTS),
-                          Text(dataList[index]["lastName"],
-                              style: kPlayerCardTextTS),
-                          Text(
-                              DateFormat('dd.MM.yyyy').format(
-                                  DateTime.fromMillisecondsSinceEpoch(
-                                      dataList[index]["birthday"])),
+                          Text(teamsTitleList[selectedTeam]['title'],
                               style:
-                              kPlayerCardTextTS), //dataList[index]["birthday"]
+                                  kPlayerCardSubtitleTS), //teamsTitleList[selectedTeam]['title']
+                          Text(seasonsTitleList[selectedSeason]['title'],
+                              style:
+                                  kPlayerCardSubtitleTS), //seasonsTitleList[selectedSeason]['title']
                         ],
                       ),
                     ),
-                    Expanded(
-                      child: CircleAvatar(
-                        radius: 54,
-                        backgroundColor: kAmahoroColorMaterial,
-                        child: FutureBuilder(
-                          future: downloadURL(dataList[index]["photoURL"]),
-                          builder: (context, AsyncSnapshot<String> snapshot) {
-                            if (snapshot.hasError) {
-                              return const CircleAvatar(
-                                backgroundColor: Colors.white,
-                                //backgroundImage: imageBytes!=null ? Image.memory(imageBytes!).image : null,
-                                radius: 48,
-                                child: Icon(
-                                  Icons.person,
-                                  color: kAmahoroColorMaterial,
-                                ),
-                              );
-                            }
-                            if (snapshot.connectionState ==
-                                ConnectionState.done) {
-                              return CircleAvatar(
-                                backgroundColor: Colors.white,
-                                backgroundImage: Image.network(
-                                  snapshot.data!,
-                                  fit: BoxFit.cover,
-                                ).image,
-                                radius: 48,
-                              );
-                            }
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          },
+                  ),
+                  Expanded(
+                    flex: 5,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text(dataList[index]["firstName"],
+                                  style: kPlayerCardTextTS),
+                              Text(dataList[index]["lastName"],
+                                  style: kPlayerCardTextTS),
+                              Text(
+                                  DateFormat('dd.MM.yyyy').format(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                          dataList[index]["birthday"])),
+                                  style:
+                                      kPlayerCardTextTS), //dataList[index]["birthday"]
+                            ],
+                          ),
                         ),
-                      ),
+                        Expanded(
+                          child: CircleAvatar(
+                            radius: 54,
+                            backgroundColor: kAmahoroColorMaterial,
+                            child: FutureBuilder(
+                              future: downloadURL(dataList[index]["photoURL"]),
+                              builder:
+                                  (context, AsyncSnapshot<String> snapshot) {
+                                if (snapshot.hasError) {
+                                  return const CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    //backgroundImage: imageBytes!=null ? Image.memory(imageBytes!).image : null,
+                                    radius: 48,
+                                    child: Icon(
+                                      Icons.person,
+                                      color: kAmahoroColorMaterial,
+                                    ),
+                                  );
+                                }
+                                if (snapshot.connectionState ==
+                                    ConnectionState.done) {
+                                  return CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    backgroundImage: Image.network(
+                                      snapshot.data!,
+                                      fit: BoxFit.cover,
+                                    ).image,
+                                    radius: 48,
+                                  );
+                                }
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ), controller: screenshotController);
+            ),
+            controller: screenshotController);
         playerCardList.add(playerCard);
         screenshotControllerList.add(screenshotController);
         return playerCard;
@@ -429,6 +433,28 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                 },
               ),
               BasicWidgets.buildTitle('Members'),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      primary: playerCardList.isNotEmpty
+                          ? Colors.white
+                          : Colors.grey.shade600,
+                      backgroundColor: playerCardList.isNotEmpty
+                          ? const Color.fromRGBO(163, 119, 101, 1)
+                          : Colors.grey.shade400,
+                    ),
+                    child: Text(
+                      'Export as PDF',
+                      style: kDefaultTextStyle.copyWith(color: Colors.white),
+                    ),
+                    onPressed: () async {
+                      await createPDF();
+                    },
+                  ),
+                ),
+              ),
               FutureBuilder(
                 future: getData(),
                 builder: (context, snapshot) {
@@ -438,40 +464,13 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                     );
                   }
                   if (snapshot.connectionState == ConnectionState.done) {
+                    screenshotControllerList.clear();
                     return playerList.isEmpty
                         ? Text('No Player found')
                         : buildItems(playerList);
                   }
                   return const Center(child: CircularProgressIndicator());
                 },
-              ),
-              TextButton(
-                style: TextButton.styleFrom(
-                  primary: playerCardList.isNotEmpty
-                      ? Colors.white
-                      : Colors.grey.shade600,
-                  backgroundColor: playerCardList.isNotEmpty
-                      ? const Color.fromRGBO(163, 119, 101, 1)
-                      : Colors.grey.shade400,
-                ),
-                child: Text(
-                  'Export as PDF',
-                  style: kDefaultTextStyle.copyWith(color: Colors.white),
-                ),
-                onPressed: () async {
-                  await createPDF();
-                },
-              ),
-              Screenshot(
-                controller: scontroller,
-                child: Container(
-                  padding: const EdgeInsets.all(30.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blueAccent, width: 5.0),
-                    color: Colors.redAccent,
-                  ),
-                  child: const Text("This is an invisible widget"),
-                ),
               ),
             ],
           ),
@@ -494,21 +493,38 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
     html.document.body?.children.add(anchor);
   }
 
+  List<Uint8List> playerCardImages = [];
+  capturePlayerCards() async {
+    playerCardImages.clear();
+    for (ScreenshotController screenshotController
+        in screenshotControllerList) {
+      await screenshotController
+          .capture()
+          .then((value) => playerCardImages.add(value!));
+    }
+    print('length ' + playerCardImages.length.toString());
+    return playerCardImages;
+  }
+
   createPDF() async {
-    await screenshotControllerList.first.capture()
-        .then((capturedImage) {
-        pdf.addPage(
-          pw.Page(
-            pageFormat: PdfPageFormat.a4,
-            build: (context) {
-              return pw.Expanded(
-                child: pw.Image(pw.MemoryImage(capturedImage!),
-                    fit: pw.BoxFit.contain),
-              );
-            },
-          ),
-        );
-      },
-    ).then((value) => savePDF()).then((value) => anchor.click());
+    await capturePlayerCards()
+        .then(
+          (capturedImage) {
+            pdf.addPage(
+              pw.Page(
+                pageFormat: PdfPageFormat.a4,
+                build: (context) {
+                  return pw.Column(children: [
+                    for (var playerCardImage in playerCardImages)
+                      pw.Image(pw.MemoryImage(playerCardImage),
+                          fit: pw.BoxFit.contain),
+                  ]);
+                },
+              ),
+            );
+          },
+        )
+        .then((value) => savePDF())
+        .then((value) => anchor.click());
   }
 }
