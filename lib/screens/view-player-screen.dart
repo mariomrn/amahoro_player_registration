@@ -514,11 +514,9 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
               pw.Page(
                 pageFormat: PdfPageFormat.a4,
                 build: (context) {
-                  return pw.Column(children: [
-                    for (var playerCardImage in playerCardImages)
-                      pw.Image(pw.MemoryImage(playerCardImage),
-                          fit: pw.BoxFit.contain),
-                  ]);
+                  return pw.Column(
+                    children: buildRows(),
+                  );
                 },
               ),
             );
@@ -526,5 +524,32 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
         )
         .then((value) => savePDF())
         .then((value) => anchor.click());
+  }
+
+  List<pw.Row> buildRows() {
+    List<pw.Row> playercardRows = [];
+    List<Uint8List> playerCardtemp = [];
+    for (var playerCardImage in playerCardImages) {
+      playerCardtemp.add(playerCardImage);
+      if (playerCardtemp.length > 1) {
+        playercardRows.add(
+          pw.Row(
+            children: [
+              for (var playercardimage in playerCardtemp)
+                pw.Container(
+                  height: 100,
+                  width: 250,
+                  child: pw.Image(
+                    pw.MemoryImage(playercardimage),
+                    fit: pw.BoxFit.contain,
+                  ),
+                ),
+            ],
+          ),
+        );
+        playerCardtemp.clear();
+      }
+    }
+    return playercardRows;
   }
 }
