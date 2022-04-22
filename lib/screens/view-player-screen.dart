@@ -448,7 +448,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                           : Colors.grey.shade400,
                     ),
                     child: Text(
-                      'Export as PDF',
+                      'Export as PDF :-)',
                       style: kDefaultTextStyle.copyWith(color: Colors.white),
                     ),
                     onPressed: () async {
