@@ -448,7 +448,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                           : Colors.grey.shade400,
                     ),
                     child: Text(
-                      'Export all as PDF 2',
+                      'Open as PDF',
                       style: kDefaultTextStyle.copyWith(color: Colors.white),
                     ),
                     onPressed: () async {
@@ -488,15 +488,15 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
     Uint8List pdfInBytes = await pdf.save();
     final blob = html.Blob([pdfInBytes], 'application/pdf');
     final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor =
-    html.document.createElement('a') as html.AnchorElement
-      ..href = url
-      ..style.display = 'none'
-      ..download = 'some_name.pdf';
-    html.document.body?.children.add(anchor);
-    anchor.click();
-    html.document.body?.children.remove(anchor);
-    html.Url.revokeObjectUrl(url);
+    // final anchor =
+    // html.document.createElement('a') as html.AnchorElement
+    //   ..href = url
+    //   ..style.display = 'none'
+    //   ..download = 'some_name.pdf';
+    // html.document.body?.children.add(anchor);
+    // anchor.click();
+    // html.document.body?.children.remove(anchor);
+    // html.Url.revokeObjectUrl(url);
     // that was not helpful:
     // html.AnchorElement anchorElement =  html.AnchorElement(href: url);
     // anchorElement.download = url;
@@ -507,6 +507,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
     //   ..download = 'pdf.pdf';
     // html.document.body?.children.add(anchor);
     // anchor.click();
+    html.window.open(url, 'PlaceholderName');
   }
 
   List<Uint8List> playerCardImages = [];
