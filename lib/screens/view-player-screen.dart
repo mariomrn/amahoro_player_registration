@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:html' as html;
 import 'dart:typed_data';
 import 'package:amahoro_player_registration/screens/widgets/basicWidgets.dart';
@@ -458,7 +457,6 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                   ),
                 ),
               ),
-              Text(text),
               FutureBuilder(
                 future: getData(),
                 builder: (context, snapshot) {
@@ -490,15 +488,17 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
   savePDF() async {
     Uint8List pdfInBytes = await pdf.save();
     final blob = html.Blob([pdfInBytes], 'application/pdf');
-    //final url = html.Url.createObjectUrlFromBlob(blob);
-    //html.AnchorElement anchorElement =  html.AnchorElement(href: url);
-    //anchorElement.download = url;
-    //anchorElement.click();
-    final content = base64Encode(pdfInBytes);
-    final anchor = html.AnchorElement(
-        href: "data:application/octet-stream;charset=utf-16le;base64,$content")
-      ..setAttribute("download", "file.pdf")
-      ..click();
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    html.AnchorElement anchorElement =  html.AnchorElement(href: url);
+    anchorElement.download = url;
+    anchorElement.click();
+
+    //final content = base64Encode(pdfInBytes);
+    //final anchor = html.AnchorElement(
+    //    href: "data:application/octet-stream;charset=utf-16le;base64,$content")
+    //  ..setAttribute("download", "file.pdf")
+    //  ..click();
+
     // final anchor =
     // html.document.createElement('a') as html.AnchorElement
     //   ..href = url
@@ -527,8 +527,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
   List<Uint8List> playerCardImages = [];
   capturePlayerCards() async {
     playerCardImages.clear();
-    for (ScreenshotController screenshotController
-        in screenshotControllerList) {
+    for (ScreenshotController screenshotController in screenshotControllerList) {
       await screenshotController
           .capture()
           .then((value) => playerCardImages.add(value!));
@@ -538,6 +537,16 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
   }
 
   createPDF() async {
+    //screenshotControllerList.first.capture().then((value) {
+    //  final _base64 = base64Encode(value!);
+    //  final anchor =
+    //  html.AnchorElement(href: 'data:application/octet-stream;base64,$_base64')
+    //    ..download = "image.png"
+    //    ..target = 'blank';
+    //  html.document.body!.append(anchor);
+    //  anchor.click();
+    //  anchor.remove();
+    //});
     await capturePlayerCards()
         .then(
           (capturedImage) {
@@ -579,6 +588,24 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
         );
         playerCardtemp.clear();
       }
+    }
+    if (playerCardtemp.isNotEmpty){
+      playercardRows.add(
+        pw.Row(
+          children: [
+            for (var playercardimage in playerCardtemp)
+              pw.Container(
+                height: 100,
+                width: 250,
+                child: pw.Image(
+                  pw.MemoryImage(playercardimage),
+                  fit: pw.BoxFit.contain,
+                ),
+              ),
+          ],
+        ),
+      );
+      playerCardtemp.clear();
     }
     return playercardRows;
   }
