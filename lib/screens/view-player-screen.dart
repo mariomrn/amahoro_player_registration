@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import '../theme/textStyles.dart';
 import 'package:screenshot/screenshot.dart';
@@ -43,6 +44,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
   late Future _futureGetTeams;
   List playerList = [];
   List<Widget> playerCardList = [];
+  ScreenshotController scontroller = ScreenshotController();
 
   @override
   void initState() {
@@ -165,6 +167,8 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
     return downloadURL;
   }
 
+  List<ScreenshotController> screenshotControllerList = [];
+
   Widget buildItems(dataList) => ListView.separated(
       padding: const EdgeInsets.all(8),
       itemCount: dataList.length,
@@ -172,7 +176,8 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
       shrinkWrap: true,
       separatorBuilder: (BuildContext context, int index) => const Divider(),
       itemBuilder: (BuildContext context, int index) {
-        Widget playerCard = Container(
+        ScreenshotController screenshotController = ScreenshotController();
+        Widget playerCard = Screenshot(child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(
@@ -189,9 +194,9 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                   flex: 2,
                   child: Center(
                       child: Text(
-                    leagueTitleList[selectedLeague]['title'].toUpperCase(),
-                    style: kPlayerCardLeagueTS,
-                  ))), //leagueTitleList[selectedLeague]['title']
+                        leagueTitleList[selectedLeague]['title'].toUpperCase(),
+                        style: kPlayerCardLeagueTS,
+                      ))), //leagueTitleList[selectedLeague]['title']
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -200,10 +205,10 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                     children: [
                       Text(teamsTitleList[selectedTeam]['title'],
                           style:
-                              kPlayerCardSubtitleTS), //teamsTitleList[selectedTeam]['title']
+                          kPlayerCardSubtitleTS), //teamsTitleList[selectedTeam]['title']
                       Text(seasonsTitleList[selectedSeason]['title'],
                           style:
-                              kPlayerCardSubtitleTS), //seasonsTitleList[selectedSeason]['title']
+                          kPlayerCardSubtitleTS), //seasonsTitleList[selectedSeason]['title']
                     ],
                   ),
                 ),
@@ -226,7 +231,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                                   DateTime.fromMillisecondsSinceEpoch(
                                       dataList[index]["birthday"])),
                               style:
-                                  kPlayerCardTextTS), //dataList[index]["birthday"]
+                              kPlayerCardTextTS), //dataList[index]["birthday"]
                         ],
                       ),
                     ),
@@ -270,8 +275,9 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
               ),
             ],
           ),
-        );
+        ), controller: screenshotController);
         playerCardList.add(playerCard);
+        screenshotControllerList.add(screenshotController);
         return playerCard;
       });
 
@@ -456,6 +462,17 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                   await createPDF();
                 },
               ),
+              Screenshot(
+                controller: scontroller,
+                child: Container(
+                  padding: const EdgeInsets.all(30.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.blueAccent, width: 5.0),
+                    color: Colors.redAccent,
+                  ),
+                  child: const Text("This is an invisible widget"),
+                ),
+              ),
             ],
           ),
         ),
@@ -478,28 +495,20 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
   }
 
   createPDF() async {
-    ScreenshotController scontroller = ScreenshotController();
-    final pdf = pw.Document();
-    scontroller
-        .captureFromWidget(Container(
-            padding: const EdgeInsets.all(30.0),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.blueAccent, width: 5.0),
-              color: Colors.redAccent,
-            ),
-            child: Text("This is an invisible widget")))
+    await screenshotControllerList.first.capture()
         .then((capturedImage) {
-          final image = pw.MemoryImage(
-            capturedImage,
-          );
-          print(image);
-          pdf.addPage(pw.Page(build: (pw.Context context) {
-            return pw.Center(
-              child: pw.Image(image),
-            ); // Center
-          }));
-        })
-        .then((value) => savePDF())
-        .then((value) => anchor.click());
+        pdf.addPage(
+          pw.Page(
+            pageFormat: PdfPageFormat.a4,
+            build: (context) {
+              return pw.Expanded(
+                child: pw.Image(pw.MemoryImage(capturedImage!),
+                    fit: pw.BoxFit.contain),
+              );
+            },
+          ),
+        );
+      },
+    ).then((value) => savePDF()).then((value) => anchor.click());
   }
 }
