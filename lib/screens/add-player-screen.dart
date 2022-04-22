@@ -27,7 +27,6 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
   bool dateGotSelected = false;
   XFile? pickedImage;
   Uint8List? imageBytes;
-  String? imageFileName;
   List leagueTitleList = [];
   List leagueDocumentList = [];
   List seasonsTitleList = [];
@@ -40,9 +39,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
   String docID1 = "";
   String docID2 = "";
   String docID3 = "";
-  late Future _futureGetLeagues;
-  late Future _futureGetSeasons;
-  late Future _futureGetTeams;
+  late Future _futureGetInitial;
 
   _selectDate(BuildContext context) async {
     final DateTime? selected = await showDatePicker(
@@ -62,9 +59,11 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
   @override
   void initState() {
     super.initState();
-    _futureGetLeagues = getLeagues();
-    _futureGetSeasons = getSeasons('SCj8y26uZv0o5HVffb4j');
-    _futureGetTeams = getTeams('SCj8y26uZv0o5HVffb4j', '1SVxOxjFnOHZzAKhRJ0y');
+    _futureGetInitial = getInitial();
+  }
+
+  Future getInitial() async {
+    getLeagues();
   }
 
   @override
@@ -78,7 +77,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
             children: [
               BasicWidgets.buildTitle('Leagues'),
               FutureBuilder(
-                future: _futureGetLeagues,
+                future: _futureGetInitial,
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return const Text(
@@ -118,7 +117,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
               ),
               BasicWidgets.buildTitle('Seasons'),
               FutureBuilder(
-                future: _futureGetSeasons,
+                future: _futureGetInitial,
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return const Text(
@@ -191,7 +190,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
               ),
               BasicWidgets.buildTitle('Teams'),
               FutureBuilder(
-                future: _futureGetTeams,
+                future: _futureGetInitial,
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return const Text(
@@ -250,8 +249,9 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                               selected: selectedTeam == index,
                               onSelected: (bool selected) {
                                 setState(() {
-                                  docID3 = teamsDocumentList[selectedTeam];
                                   selectedTeam = index;
+                                  docID3 = teamsDocumentList[selectedTeam];
+                                  print(docID3);
                                 });
                               },
                             ),
@@ -294,12 +294,10 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                       final ImagePicker _picker = ImagePicker();
                       pickedImage = await _picker.pickImage(source: ImageSource.camera, imageQuality: 40);
                       if (pickedImage == null) {
-                        print('fehlerrrrrrrrr');
                         return;
                       }
                       if (pickedImage != null){
                         imageBytes = await pickedImage?.readAsBytes();
-                        imageFileName = pickedImage?.name;
                         setState(() {
                         });
                       }
@@ -446,7 +444,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
     print(docID3);
     String firstName = firstNameController.text;
     String lastName = lastNameController.text;
-    String storageRef = 'players/$docID1/$imageFileName';
+    String storageRef = 'players/$docID1/${firstName+lastName+selectedDate.millisecondsSinceEpoch.toString()}';
     await storage.ref(storageRef).putData(imageBytes!);
     return leagueCollectionRef
         .doc(docID1)
@@ -478,6 +476,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
           leagueTitleList.add(result.data());
         }
         docID1 = leagueDocumentList[selectedLeague];
+        getSeasons(docID1);
       });
       return docID1;
     } catch (e) {

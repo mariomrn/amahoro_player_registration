@@ -39,9 +39,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
   String docID1 = "SCj8y26uZv0o5HVffb4j";
   String docID2 = "1SVxOxjFnOHZzAKhRJ0y";
   String docID3 = "";
-  late Future _futureGetLeagues;
-  late Future _futureGetSeasons;
-  late Future _futureGetTeams;
+  late Future _futureGetInitial;
   List playerList = [];
   List<Widget> playerCardList = [];
   ScreenshotController scontroller = ScreenshotController();
@@ -50,9 +48,11 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
   void initState() {
     super.initState();
     playerList.clear();
-    _futureGetLeagues = getLeagues();
-    _futureGetSeasons = getSeasons(docID1);
-    _futureGetTeams = getTeams(docID1, docID2);
+    _futureGetInitial = getInitial();
+  }
+
+  Future getInitial() async {
+    getLeagues();
   }
 
   Future getLeagues() async {
@@ -66,6 +66,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
           leagueTitleList.add(result.data());
         }
         docID1 = leagueDocumentList[selectedLeague];
+        getSeasons(docID1);
         //currentLeague = leagueTitleList[selectedLeague];
       });
       return docID1;
@@ -172,6 +173,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
 
   Widget buildItems(dataList) => ListView.separated(
       padding: const EdgeInsets.all(8),
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: dataList.length,
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
@@ -289,7 +291,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: const EdgeInsets.symmetric(horizontal: 15.0),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.max,
@@ -297,7 +299,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
             children: [
               BasicWidgets.buildTitle('Leagues'),
               FutureBuilder(
-                future: _futureGetLeagues,
+                future: _futureGetInitial,
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return const Text(
@@ -339,7 +341,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
               ),
               BasicWidgets.buildTitle('Seasons'),
               FutureBuilder(
-                future: _futureGetSeasons,
+                future: _futureGetInitial,
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return const Text(
@@ -384,7 +386,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
               ),
               BasicWidgets.buildTitle('Teams'),
               FutureBuilder(
-                future: _futureGetTeams,
+                future: _futureGetInitial,
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return const Text(

@@ -69,7 +69,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(titles[_selectedIndex], style: kDefaultTextStyle.copyWith(color: Colors.white),),
       ),
