@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:html' as html;
 import 'dart:typed_data';
 import 'package:amahoro_player_registration/screens/widgets/basicWidgets.dart';
@@ -448,7 +449,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                           : Colors.grey.shade400,
                     ),
                     child: Text(
-                      'Open as PDF',
+                      'Download PDF',
                       style: kDefaultTextStyle.copyWith(color: Colors.white),
                     ),
                     onPressed: () async {
@@ -457,6 +458,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                   ),
                 ),
               ),
+              Text(text),
               FutureBuilder(
                 future: getData(),
                 builder: (context, snapshot) {
@@ -481,13 +483,22 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
     );
   }
 
+  String text = 'not clicked';
   final pdf = pw.Document();
   var anchor;
 
   savePDF() async {
     Uint8List pdfInBytes = await pdf.save();
     final blob = html.Blob([pdfInBytes], 'application/pdf');
-    final url = html.Url.createObjectUrlFromBlob(blob);
+    //final url = html.Url.createObjectUrlFromBlob(blob);
+    //html.AnchorElement anchorElement =  html.AnchorElement(href: url);
+    //anchorElement.download = url;
+    //anchorElement.click();
+    final content = base64Encode(pdfInBytes);
+    final anchor = html.AnchorElement(
+        href: "data:application/octet-stream;charset=utf-16le;base64,$content")
+      ..setAttribute("download", "file.pdf")
+      ..click();
     // final anchor =
     // html.document.createElement('a') as html.AnchorElement
     //   ..href = url
@@ -507,7 +518,10 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
     //   ..download = 'pdf.pdf';
     // html.document.body?.children.add(anchor);
     // anchor.click();
-    html.window.open(url, 'PlaceholderName');
+    // html.window.open(url, 'PlaceholderName');
+    setState(() {
+      text = 'done';
+    });
   }
 
   List<Uint8List> playerCardImages = [];
