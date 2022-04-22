@@ -5,6 +5,7 @@ import 'package:amahoro_player_registration/theme/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -42,7 +43,8 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
   late Future _futureGetInitial;
   List playerList = [];
   List<Widget> playerCardList = [];
-  ScreenshotController scontroller = ScreenshotController();
+  List<ScreenshotController> screenshotControllerList = [];
+  final pdf = pw.Document();
 
   @override
   void initState() {
@@ -168,9 +170,6 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
     return downloadURL;
   }
 
-  //before calling buildItems screenshotcontroller list should be emptied
-  List<ScreenshotController> screenshotControllerList = [];
-
   Widget buildItems(dataList) => ListView.separated(
       padding: const EdgeInsets.all(8),
       physics: const NeverScrollableScrollPhysics(),
@@ -198,21 +197,69 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                       flex: 2,
                       child: Center(
                           child: Text(
-                        leagueTitleList[selectedLeague]['title'].toUpperCase(),
+                        teamsTitleList[selectedTeam]['title'].toUpperCase(),
                         style: kPlayerCardLeagueTS,
                       ))), //leagueTitleList[selectedLeague]['title']
                   Expanded(
+                    flex: 2,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 30.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(teamsTitleList[selectedTeam]['title'],
-                              style:
-                                  kPlayerCardSubtitleTS), //teamsTitleList[selectedTeam]['title']
-                          Text(seasonsTitleList[selectedSeason]['title'],
-                              style:
-                                  kPlayerCardSubtitleTS), //seasonsTitleList[selectedSeason]['title']
+                          Row(
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(bottom: 15.0),
+                                child: Icon(
+                                  Icons.emoji_events_outlined,
+                                  color: Colors.black54,
+                                  size: 22,
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(leagueTitleList[selectedLeague]['title'],
+                                      style: kPlayerCardSubtitleTS),
+                                  Text(
+                                    'League',
+                                    style: kDefaultTextStyle10pt,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ), //teamsTitleList[selectedTeam]['title']
+                          Row(
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(bottom: 18.0),
+                                child: Icon(
+                                  Icons.flag_outlined,
+                                  color: Colors.black54,
+                                  size: 22,
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                      seasonsTitleList[selectedSeason]['title'],
+                                      style: kPlayerCardSubtitleTS),
+                                  Text(
+                                    'Season',
+                                    style: kDefaultTextStyle10pt,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ), //seasonsTitleList[selectedSeason]['title']
                         ],
                       ),
                     ),
@@ -434,28 +481,21 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                   return const Center(child: CircularProgressIndicator());
                 },
               ),
-              BasicWidgets.buildTitle('Members'),
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                      primary: playerCardList.isNotEmpty
-                          ? Colors.white
-                          : Colors.grey.shade600,
-                      backgroundColor: playerCardList.isNotEmpty
-                          ? const Color.fromRGBO(163, 119, 101, 1)
-                          : Colors.grey.shade400,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  BasicWidgets.buildTitle('Player Cards'),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: IconButton(
+                      color: kAmahoroColorMaterial,
+                      icon: const Icon(Icons.save_alt),
+                      onPressed: () async {
+                        await createPDF();
+                      },
                     ),
-                    child: Text(
-                      'Download PDF',
-                      style: kDefaultTextStyle.copyWith(color: Colors.white),
-                    ),
-                    onPressed: () async {
-                      await createPDF();
-                    },
                   ),
-                ),
+                ],
               ),
               FutureBuilder(
                 future: getData(),
@@ -467,8 +507,9 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                   }
                   if (snapshot.connectionState == ConnectionState.done) {
                     screenshotControllerList.clear();
+                    playerCardList.clear();
                     return playerList.isEmpty
-                        ? Text('No Player found')
+                        ? const Text('No Player found')
                         : buildItems(playerList);
                   }
                   return const Center(child: CircularProgressIndicator());
@@ -481,53 +522,20 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
     );
   }
 
-  String text = 'not clicked';
-  final pdf = pw.Document();
-  var anchor;
-
   savePDF() async {
     Uint8List pdfInBytes = await pdf.save();
     final blob = html.Blob([pdfInBytes], 'application/pdf');
     final url = html.Url.createObjectUrlFromBlob(blob);
-    html.AnchorElement anchorElement =  html.AnchorElement(href: url);
+    html.AnchorElement anchorElement = html.AnchorElement(href: url);
     anchorElement.download = url;
     anchorElement.click();
-
-    //final content = base64Encode(pdfInBytes);
-    //final anchor = html.AnchorElement(
-    //    href: "data:application/octet-stream;charset=utf-16le;base64,$content")
-    //  ..setAttribute("download", "file.pdf")
-    //  ..click();
-
-    // final anchor =
-    // html.document.createElement('a') as html.AnchorElement
-    //   ..href = url
-    //   ..style.display = 'none'
-    //   ..download = 'some_name.pdf';
-    // html.document.body?.children.add(anchor);
-    // anchor.click();
-    // html.document.body?.children.remove(anchor);
-    // html.Url.revokeObjectUrl(url);
-    // that was not helpful:
-    // html.AnchorElement anchorElement =  html.AnchorElement(href: url);
-    // anchorElement.download = url;
-    // anchorElement.click();
-    // anchor = html.document.createElement('a') as html.AnchorElement
-    //   ..href = url
-    //   ..style.display = 'none'
-    //   ..download = 'pdf.pdf';
-    // html.document.body?.children.add(anchor);
-    // anchor.click();
-    // html.window.open(url, 'PlaceholderName');
-    setState(() {
-      text = 'done';
-    });
   }
 
   List<Uint8List> playerCardImages = [];
   capturePlayerCards() async {
     playerCardImages.clear();
-    for (ScreenshotController screenshotController in screenshotControllerList) {
+    for (ScreenshotController screenshotController
+        in screenshotControllerList) {
       await screenshotController
           .capture()
           .then((value) => playerCardImages.add(value!));
@@ -547,22 +555,20 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
     //  anchor.click();
     //  anchor.remove();
     //});
-    await capturePlayerCards()
-        .then(
-          (capturedImage) {
-            pdf.addPage(
-              pw.Page(
-                pageFormat: PdfPageFormat.a4,
-                build: (context) {
-                  return pw.Column(
-                    children: buildRows(),
-                  );
-                },
-              ),
-            );
-          },
-        )
-        .then((value) => savePDF());
+    await capturePlayerCards().then(
+      (capturedImage) {
+        pdf.addPage(
+          pw.Page(
+            pageFormat: PdfPageFormat.a4,
+            build: (context) {
+              return pw.Column(
+                children: buildRows(),
+              );
+            },
+          ),
+        );
+      },
+    ).then((value) => savePDF());
   }
 
   List<pw.Row> buildRows() {
@@ -570,7 +576,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
     List<Uint8List> playerCardtemp = [];
     for (var playerCardImage in playerCardImages) {
       playerCardtemp.add(playerCardImage);
-      if (playerCardtemp.length > 1) {
+      if (playerCardtemp.length > 2) {
         playercardRows.add(
           pw.Row(
             children: [
@@ -589,7 +595,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
         playerCardtemp.clear();
       }
     }
-    if (playerCardtemp.isNotEmpty){
+    if (playerCardtemp.isNotEmpty) {
       playercardRows.add(
         pw.Row(
           children: [

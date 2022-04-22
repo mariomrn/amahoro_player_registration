@@ -8,9 +8,16 @@ TextStyle kTitleTextStyle = GoogleFonts.inter(
 TextStyle kDefaultTextStyle = GoogleFonts.inter(
   textStyle: TextStyle(color: kAmahoroColor),
 );
+TextStyle kDefaultTextStyle10pt = GoogleFonts.inter(
+  textStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.black54),
+);
 TextStyle kDefaultTextStyle11pt = GoogleFonts.inter(
   textStyle: TextStyle(fontSize: 11, color: kAmahoroColor),
 );
+TextStyle kDefaultTextStyle15pt = GoogleFonts.inter(
+  textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black54),
+);
+
 
 TextStyle kPlayerCardLeagueTS = GoogleFonts.patrickHand(
   textStyle: TextStyle(fontSize: 35, letterSpacing: 2, fontWeight: FontWeight.w700, color: kAmahoroColor),
