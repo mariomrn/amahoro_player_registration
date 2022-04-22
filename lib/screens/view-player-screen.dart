@@ -493,6 +493,11 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
       ..style.display = 'none'
       ..download = 'pdf.pdf';
     html.document.body?.children.add(anchor);
+
+    //fix
+    html.AnchorElement anchorElement =  html.AnchorElement(href: url);
+    anchorElement.download = url;
+    anchorElement.click();
   }
 
   List<Uint8List> playerCardImages = [];
