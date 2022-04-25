@@ -180,152 +180,156 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
       itemBuilder: (BuildContext context, int index) {
         ScreenshotController screenshotController = ScreenshotController();
         Widget playerCard = Screenshot(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(
-                  color: kAmahoroColorMaterial,
-                  width: 10,
+            child: Center(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(
+                    color: kAmahoroColorMaterial,
+                    width: 10,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              width: 430,
-              height: 260,
-              child: Column(
-                children: [
-                  Expanded(
+                width: 500,
+                height: 260,
+                child: Row(
+                  children: [
+                    Expanded(
                       flex: 2,
-                      child: Center(
-                          child: Text(
-                        teamsTitleList[selectedTeam]['title'].toUpperCase(),
-                        style: kPlayerCardLeagueTS,
-                      ))), //leagueTitleList[selectedLeague]['title']
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: Column(
                         children: [
-                          Row(
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.only(bottom: 15.0),
-                                child: Icon(
-                                  Icons.emoji_events_outlined,
-                                  color: Colors.black54,
-                                  size: 22,
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                          Expanded(
+                              flex: 2,
+                              child: Center(
+                                  child: Text(
+                                teamsTitleList[selectedTeam]['title'].toUpperCase(),
+                                style: kPlayerCardLeagueTS,
+                              ))), //leagueTitleList[selectedLeague]['title']
+                          Expanded(
+                            flex: 2,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(leagueTitleList[selectedLeague]['title'],
-                                      style: kPlayerCardSubtitleTS),
-                                  Text(
-                                    'League',
-                                    style: kDefaultTextStyle10pt,
-                                  ),
+                                  Row(
+                                    children: [
+                                      const Padding(
+                                        padding: EdgeInsets.only(bottom: 15.0),
+                                        child: Icon(
+                                          Icons.emoji_events_outlined,
+                                          color: Colors.black54,
+                                          size: 22,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(leagueTitleList[selectedLeague]['title'],
+                                              style: kPlayerCardSubtitleTS),
+                                          Text(
+                                            'League',
+                                            style: kDefaultTextStyle10pt,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ), //teamsTitleList[selectedTeam]['title']
+                                  Row(
+                                    children: [
+                                      const Padding(
+                                        padding: EdgeInsets.only(bottom: 18.0),
+                                        child: Icon(
+                                          Icons.flag_outlined,
+                                          color: Colors.black54,
+                                          size: 22,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                              seasonsTitleList[selectedSeason]['title'],
+                                              style: kPlayerCardSubtitleTS),
+                                          Text(
+                                            'Season',
+                                            style: kDefaultTextStyle10pt,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ), //seasonsTitleList[selectedSeason]['title']
                                 ],
                               ),
-                            ],
-                          ), //teamsTitleList[selectedTeam]['title']
-                          Row(
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.only(bottom: 18.0),
-                                child: Icon(
-                                  Icons.flag_outlined,
-                                  color: Colors.black54,
-                                  size: 22,
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                      seasonsTitleList[selectedSeason]['title'],
-                                      style: kPlayerCardSubtitleTS),
-                                  Text(
-                                    'Season',
-                                    style: kDefaultTextStyle10pt,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ), //seasonsTitleList[selectedSeason]['title']
+                            ),
+                          ),
+                          Expanded(
+                            flex: 5,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(dataList[index]["firstName"],
+                                    style: kPlayerCardTextTS),
+                                Text(dataList[index]["lastName"],
+                                    style: kPlayerCardTextTS),
+                                Text(
+                                    DateFormat('dd.MM.yyyy').format(
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                            dataList[index]["birthday"])),
+                                    style:
+                                        kPlayerCardTextTS), //dataList[index]["birthday"]
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 5,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Text(dataList[index]["firstName"],
-                                  style: kPlayerCardTextTS),
-                              Text(dataList[index]["lastName"],
-                                  style: kPlayerCardTextTS),
-                              Text(
-                                  DateFormat('dd.MM.yyyy').format(
-                                      DateTime.fromMillisecondsSinceEpoch(
-                                          dataList[index]["birthday"])),
-                                  style:
-                                      kPlayerCardTextTS), //dataList[index]["birthday"]
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: CircleAvatar(
-                            radius: 54,
-                            backgroundColor: kAmahoroColorMaterial,
-                            child: FutureBuilder(
-                              future: downloadURL(dataList[index]["photoURL"]),
-                              builder:
-                                  (context, AsyncSnapshot<String> snapshot) {
-                                if (snapshot.hasError) {
-                                  return const CircleAvatar(
-                                    backgroundColor: Colors.white,
-                                    //backgroundImage: imageBytes!=null ? Image.memory(imageBytes!).image : null,
-                                    radius: 48,
-                                    child: Icon(
-                                      Icons.person,
-                                      color: kAmahoroColorMaterial,
-                                    ),
-                                  );
-                                }
-                                if (snapshot.connectionState ==
-                                    ConnectionState.done) {
-                                  return CircleAvatar(
-                                    backgroundColor: Colors.white,
-                                    backgroundImage: Image.network(
-                                      snapshot.data!,
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        width: 200,
+                        height: 240,
+                        child: FutureBuilder(
+                          future: downloadURL(dataList[index]["photoURL"]),
+                          builder:
+                              (context, AsyncSnapshot<String> snapshot) {
+                            if (snapshot.hasError) {
+                              return const Icon(
+                                Icons.person,
+                                color: kAmahoroColorMaterial,
+                              );
+                            }
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              return Center(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: Image.network(
+                                          snapshot.data!).image,
                                       fit: BoxFit.cover,
-                                    ).image,
-                                    radius: 48,
-                                  );
-                                }
-                                return const Center(
-                                    child: CircularProgressIndicator());
-                              },
-                            ),
-                          ),
+                                    ),
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  width: 180,
+                                  height: 220,
+                                ),
+                              );
+                            }
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          },
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             controller: screenshotController);
@@ -576,7 +580,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
     List<Uint8List> playerCardtemp = [];
     for (var playerCardImage in playerCardImages) {
       playerCardtemp.add(playerCardImage);
-      if (playerCardtemp.length > 2) {
+      if (playerCardtemp.length > 1) {
         playercardRows.add(
           pw.Row(
             children: [
