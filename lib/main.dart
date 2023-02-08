@@ -1,5 +1,5 @@
 import 'package:amahoro_player_registration/screens/add-player-screen.dart';
-import 'package:amahoro_player_registration/screens/view-player-screen.dart';
+import 'package:amahoro_player_registration/screens/view-player-screen-template.dart';
 import 'package:amahoro_player_registration/theme/colors.dart';
 import 'package:amahoro_player_registration/theme/textStyles.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   static const List<Widget> _screens = <Widget>[
     AddPlayerScreen(),
-    ViewPlayerScreen(),
+    ViewPlayerScreenT(),
   ];
 
   void _onItemTapped(int index) {
