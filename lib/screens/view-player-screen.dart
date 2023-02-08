@@ -202,15 +202,18 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                               flex: 2,
                               child: Center(
                                   child: Text(
-                                teamsTitleList[selectedTeam]['title'].toUpperCase(),
+                                teamsTitleList[selectedTeam]['title']
+                                    .toUpperCase(),
                                 style: kPlayerCardLeagueTS,
                               ))), //leagueTitleList[selectedLeague]['title']
                           Expanded(
                             flex: 2,
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 30.0),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     children: [
@@ -226,9 +229,12 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                                         width: 5,
                                       ),
                                       Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          Text(leagueTitleList[selectedLeague]['title'],
+                                          Text(
+                                              leagueTitleList[selectedLeague]
+                                                  ['title'],
                                               style: kPlayerCardSubtitleTS),
                                           Text(
                                             'League',
@@ -252,10 +258,12 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                                         width: 5,
                                       ),
                                       Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                              seasonsTitleList[selectedSeason]['title'],
+                                              seasonsTitleList[selectedSeason]
+                                                  ['title'],
                                               style: kPlayerCardSubtitleTS),
                                           Text(
                                             'Season',
@@ -297,8 +305,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                         height: 240,
                         child: FutureBuilder(
                           future: downloadURL(dataList[index]["photoURL"]),
-                          builder:
-                              (context, AsyncSnapshot<String> snapshot) {
+                          builder: (context, AsyncSnapshot<String> snapshot) {
                             if (snapshot.hasError) {
                               return const Icon(
                                 Icons.person,
@@ -311,8 +318,8 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                                 child: Container(
                                   decoration: BoxDecoration(
                                     image: DecorationImage(
-                                      image: Image.network(
-                                          snapshot.data!).image,
+                                      image:
+                                          Image.network(snapshot.data!).image,
                                       fit: BoxFit.cover,
                                     ),
                                     borderRadius: BorderRadius.circular(5),
@@ -549,16 +556,6 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
   }
 
   createPDF() async {
-    //screenshotControllerList.first.capture().then((value) {
-    //  final _base64 = base64Encode(value!);
-    //  final anchor =
-    //  html.AnchorElement(href: 'data:application/octet-stream;base64,$_base64')
-    //    ..download = "image.png"
-    //    ..target = 'blank';
-    //  html.document.body!.append(anchor);
-    //  anchor.click();
-    //  anchor.remove();
-    //});
     await capturePlayerCards().then(
       (capturedImage) {
         pdf.addPage(
@@ -585,12 +582,14 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
           pw.Row(
             children: [
               for (var playercardimage in playerCardtemp)
-                pw.Container(
-                  height: 100,
-                  width: 250,
-                  child: pw.Image(
-                    pw.MemoryImage(playercardimage),
-                    fit: pw.BoxFit.contain,
+                pw.Center(
+                  child: pw.Container(
+                    height: 100,
+                    width: 250,
+                    child: pw.Image(
+                      pw.MemoryImage(playercardimage),
+                      fit: pw.BoxFit.contain,
+                    ),
                   ),
                 ),
             ],
@@ -604,12 +603,14 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
         pw.Row(
           children: [
             for (var playercardimage in playerCardtemp)
-              pw.Container(
-                height: 100,
-                width: 250,
-                child: pw.Image(
-                  pw.MemoryImage(playercardimage),
-                  fit: pw.BoxFit.contain,
+              pw.Center(
+                child: pw.Container(
+                  height: 100,
+                  width: 250,
+                  child: pw.Image(
+                    pw.MemoryImage(playercardimage),
+                    fit: pw.BoxFit.contain,
+                  ),
                 ),
               ),
           ],
