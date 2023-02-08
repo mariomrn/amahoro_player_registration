@@ -191,7 +191,7 @@ class _ViewPlayerScreenTState extends State<ViewPlayerScreenT> {
                 child: Row(
                   children: [
                     Expanded(
-                      flex: 2,
+                      flex: 34,
                       child: Column(
                         children: [
                           Expanded(
@@ -230,7 +230,7 @@ class _ViewPlayerScreenTState extends State<ViewPlayerScreenT> {
                       ),
                     ),
                     Expanded(
-                      flex: 1,
+                      flex: 23,
                       child: Container(
                         width: 200,
                         height: 240,
@@ -255,7 +255,7 @@ class _ViewPlayerScreenTState extends State<ViewPlayerScreenT> {
                                     ),
                                     borderRadius: BorderRadius.circular(5),
                                   ),
-                                  width: 180,
+                                  width: 170,
                                   height: 220,
                                 ),
                               );
@@ -265,6 +265,10 @@ class _ViewPlayerScreenTState extends State<ViewPlayerScreenT> {
                           },
                         ),
                       ),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: Container(),
                     ),
                   ],
                 ),
