@@ -93,7 +93,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                           padding: const EdgeInsets.all(2.0),
                           child: ChoiceChip(
                             selectedColor:
-                                const Color.fromRGBO(163, 119, 101, 1),
+                            kAmahoroColorMaterial.shade700,
                             labelStyle: selectedLeague == index
                                 ? kDefaultTextStyle.copyWith(
                                     color: Colors.white)
@@ -142,9 +142,9 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                                 labelStyle: kDefaultTextStyle.copyWith(
                                     color: Colors.white),
                                 backgroundColor: Colors.grey.shade200,
-                                label: const Icon(
+                                label: Icon(
                                   Icons.add,
-                                  color: Color.fromRGBO(163, 119, 101, 1),
+                                  color: kAmahoroColorMaterial.shade700,
                                   size: 15,
                                 ),
                                 selected: true,
@@ -165,7 +165,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                             padding: const EdgeInsets.all(2.0),
                             child: ChoiceChip(
                               selectedColor:
-                                  const Color.fromRGBO(163, 119, 101, 1),
+                              kAmahoroColorMaterial.shade700,
                               labelStyle: selectedSeason == index
                                   ? kDefaultTextStyle.copyWith(
                                       color: Colors.white)
@@ -215,9 +215,9 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                                 labelStyle: kDefaultTextStyle.copyWith(
                                     color: Colors.white),
                                 backgroundColor: Colors.grey.shade200,
-                                label: const Icon(
+                                label: Icon(
                                   Icons.add,
-                                  color: Color.fromRGBO(163, 119, 101, 1),
+                                  color: kAmahoroColorMaterial.shade700,
                                   size: 15,
                                 ),
                                 selected: true,
@@ -240,7 +240,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                             padding: const EdgeInsets.all(2.0),
                             child: ChoiceChip(
                               selectedColor:
-                                  const Color.fromRGBO(163, 119, 101, 1),
+                              kAmahoroColorMaterial.shade700,
                               labelStyle: selectedTeam == index
                                   ? kDefaultTextStyle.copyWith(
                                       color: Colors.white)
@@ -294,7 +294,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                   TextButton(
                     child: Text(
                       'Add Photo',
-                      style: kDefaultTextStyle,
+                      style: kDefaultTextStyle.copyWith(color: kAmahoroColorMaterial.shade700),
                     ),
                     onPressed: () async {
                       final ImagePicker _picker = ImagePicker();
@@ -335,7 +335,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                   TextButton(
                     child: Text(
                       'Choose Birthday',
-                      style: kDefaultTextStyle,
+                      style: kDefaultTextStyle.copyWith(color: kAmahoroColorMaterial.shade700),
                     ),
                     onPressed: () {
                       _selectDate(context);
@@ -357,7 +357,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                             ? Colors.white
                             : Colors.grey.shade600,
                         backgroundColor: informationIsComplete()
-                            ? const Color.fromRGBO(163, 119, 101, 1)
+                            ? kAmahoroColorMaterial.shade700
                             : Colors.grey.shade400,
                       ),
                       child: Text(
