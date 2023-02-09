@@ -92,9 +92,11 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                         return Padding(
                           padding: const EdgeInsets.all(2.0),
                           child: ChoiceChip(
-                            selectedColor: const Color.fromRGBO(163, 119, 101, 1),
+                            selectedColor:
+                                const Color.fromRGBO(163, 119, 101, 1),
                             labelStyle: selectedLeague == index
-                                ? kDefaultTextStyle.copyWith(color: Colors.white)
+                                ? kDefaultTextStyle.copyWith(
+                                    color: Colors.white)
                                 : kDefaultTextStyle.copyWith(
                                     color: Colors.grey.shade600),
                             backgroundColor: Colors.grey.shade200,
@@ -275,12 +277,16 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                         backgroundColor: kAmahoroColorMaterial,
                         child: CircleAvatar(
                           backgroundColor: Colors.white,
-                          backgroundImage: imageBytes!=null ? Image.memory(imageBytes!).image : null,
+                          backgroundImage: imageBytes != null
+                              ? Image.memory(imageBytes!).image
+                              : null,
                           radius: 48,
-                          child: imageBytes!=null ? Container() : const Icon(
-                            Icons.person,
-                            color: kAmahoroColorMaterial,
-                          ),
+                          child: imageBytes != null
+                              ? Container()
+                              : const Icon(
+                                  Icons.person,
+                                  color: kAmahoroColorMaterial,
+                                ),
                         ),
                       ),
                     ),
@@ -292,14 +298,14 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                     ),
                     onPressed: () async {
                       final ImagePicker _picker = ImagePicker();
-                      pickedImage = await _picker.pickImage(source: ImageSource.camera, imageQuality: 15);
+                      pickedImage = await _picker.pickImage(
+                          source: ImageSource.camera, imageQuality: 5);
                       if (pickedImage == null) {
                         return;
                       }
-                      if (pickedImage != null){
+                      if (pickedImage != null) {
                         imageBytes = await pickedImage?.readAsBytes();
-                        setState(() {
-                        });
+                        setState(() {});
                       }
                     },
                   ),
@@ -338,7 +344,8 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 30),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 30),
                 child: Row(
                   children: [
                     Expanded(
@@ -360,10 +367,8 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                       onPressed: informationIsComplete()
                           ? () {
                               addPlayer();
-                              setState(() {
-                                resetValues();
-                              });
-                            } : null,
+                            }
+                          : null,
                     ),
                     Expanded(
                       child: Container(),
@@ -389,9 +394,10 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
 
   bool informationIsComplete() {
     return dateGotSelected &&
-                            firstNameController.text.isNotEmpty &&
-                            lastNameController.text.isNotEmpty &&
-                        (imageBytes!=null) && docID3.length > 1;
+        firstNameController.text.isNotEmpty &&
+        lastNameController.text.isNotEmpty &&
+        (imageBytes != null) &&
+        docID3.length > 1;
   }
 
   Future<dynamic> buildShowDialog(BuildContext context, String title,
@@ -445,7 +451,8 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
     String firstName = firstNameController.text;
     String lastName = lastNameController.text;
     int birthday = selectedDate.millisecondsSinceEpoch;
-    String storageRef = 'players/$docID1/${firstName+lastName+birthday.toString()}';
+    String storageRef =
+        'players/$docID1/${firstName + lastName + birthday.toString()}';
     await storage.ref(storageRef).putData(imageBytes!);
     return leagueCollectionRef
         .doc(docID1)
@@ -458,13 +465,19 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
           'firstName': firstName,
           'lastName': lastName,
           'birthday': birthday,
-          'photoURL' : storageRef,
+          'photoURL': storageRef,
         })
         .then((value) {
-      print("Player Added");
-      resetValues();
-    })
-        .catchError((error) => print("Failed to add user: $error"));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text('Upload Success')));
+        })
+        .then((value) => setState(() {
+              resetValues();
+            }))
+        .catchError((error) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text('Fail')));
+        });
   }
 
   Future getLeagues() async {
@@ -531,7 +544,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
         }
       });
       setState(() {
-        if(teamsDocumentList.isNotEmpty) {
+        if (teamsDocumentList.isNotEmpty) {
           docID3 = teamsDocumentList[selectedTeam];
         }
       });
