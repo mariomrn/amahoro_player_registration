@@ -348,30 +348,29 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                     const EdgeInsets.symmetric(horizontal: 12.0, vertical: 30),
                 child: Row(
                   children: [
-                    Expanded(
-                      child: Container(),
-                    ),
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        primary: informationIsComplete()
-                            ? Colors.white
-                            : Colors.grey.shade600,
-                        backgroundColor: informationIsComplete()
-                            ? kAmahoroColorMaterial.shade700
-                            : Colors.grey.shade400,
+                    _inProgress ? Container() : Expanded(
+                      child: Container(
+                        height:40,
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            primary: informationIsComplete()
+                                ? Colors.white
+                                : Colors.grey.shade600,
+                            backgroundColor: informationIsComplete()
+                                ? kAmahoroColorMaterial.shade700
+                                : Colors.grey.shade400,
+                          ),
+                          child: Text(
+                            'Submit Player',
+                            style: kDefaultTextStyle.copyWith(color: Colors.white),
+                          ),
+                          onPressed: informationIsComplete()
+                              ? () {
+                                  addPlayer();
+                                }
+                              : null,
+                        ),
                       ),
-                      child: Text(
-                        'Submit Player',
-                        style: kDefaultTextStyle.copyWith(color: Colors.white),
-                      ),
-                      onPressed: informationIsComplete()
-                          ? () {
-                              addPlayer();
-                            }
-                          : null,
-                    ),
-                    Expanded(
-                      child: Container(),
                     ),
                   ],
                 ),
@@ -445,7 +444,12 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
     );
   }
 
+  bool _inProgress = false;
+
   Future<void> addPlayer() async {
+    setState(() {
+      _inProgress = true;
+    });
     print('docID3');
     print(docID3);
     String firstName = firstNameController.text;
@@ -472,6 +476,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
               .showSnackBar(const SnackBar(content: Text('Upload Success')));
         })
         .then((value) => setState(() {
+              _inProgress = false;
               resetValues();
             }))
         .catchError((error) {
