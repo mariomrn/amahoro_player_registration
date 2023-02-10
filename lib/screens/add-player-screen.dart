@@ -299,7 +299,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                     onPressed: () async {
                       final ImagePicker _picker = ImagePicker();
                       pickedImage = await _picker.pickImage(
-                          source: ImageSource.camera, maxHeight: 640, maxWidth: 480);
+                          source: ImageSource.camera, maxHeight: 640, maxWidth: 480, imageQuality: 80);
                       if (pickedImage == null) {
                         return;
                       }
