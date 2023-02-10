@@ -131,7 +131,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                           children: List<Widget>.generate(
-                        seasonsTitleList.length + 1,
+                        seasonsTitleList.length, //seasonsTitleList.length + 1 for the add choice chip to appear
                         (int index) {
                           if (index == seasonsTitleList.length) {
                             return Padding(
@@ -204,7 +204,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                           children: List<Widget>.generate(
-                        teamsTitleList.length + 1,
+                        teamsTitleList.length, //teamsTitleList.length + 1 for the add choice chip to appear
                         (int index) {
                           if (index == teamsTitleList.length) {
                             return Padding(
