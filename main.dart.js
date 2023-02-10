@@ -34829,7 +34829,7 @@ A.abK.prototype={
 $2(a,b){var s
 if(b.c!=null)return B.bZ
 if(b.a===B.aW){s=this.a
-s=A.IY(s.db.length+1,new A.abH(s,a),!0,t.l7)
+s=A.IY(s.db.length,new A.abH(s,a),!0,t.l7)
 s=A.b(s.slice(0),A.ac(s))
 return A.t6(A.dZ(s,B.S,B.J,B.K),null,B.W)}return B.bn},
 $S:31}
@@ -34873,7 +34873,7 @@ A.abL.prototype={
 $2(a,b){var s
 if(b.c!=null)return B.bZ
 if(b.a===B.aW){s=this.a
-s=A.IY(s.dy.length+1,new A.abG(s,a),!0,t.l7)
+s=A.IY(s.dy.length,new A.abG(s,a),!0,t.l7)
 s=A.b(s.slice(0),A.ac(s))
 return A.t6(A.dZ(s,B.S,B.J,B.K),null,B.W)}return B.bn},
 $S:31}
