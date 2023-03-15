@@ -12,14 +12,14 @@ import 'package:pdf/widgets.dart' as pw;
 import '../theme/textStyles.dart';
 import 'package:screenshot/screenshot.dart';
 
-class ViewPlayerScreenT extends StatefulWidget {
-  const ViewPlayerScreenT({Key? key}) : super(key: key);
+class ViewPlayerCards extends StatefulWidget {
+  const ViewPlayerCards({Key? key}) : super(key: key);
 
   @override
-  _ViewPlayerScreenTState createState() => _ViewPlayerScreenTState();
+  _ViewPlayerCardsState createState() => _ViewPlayerCardsState();
 }
 
-class _ViewPlayerScreenTState extends State<ViewPlayerScreenT> {
+class _ViewPlayerCardsState extends State<ViewPlayerCards> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionReference leagueCollectionRef =
       FirebaseFirestore.instance.collection("league");

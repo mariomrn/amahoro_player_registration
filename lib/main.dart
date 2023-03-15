@@ -1,5 +1,6 @@
 import 'package:amahoro_player_registration/screens/add-player-screen.dart';
-import 'package:amahoro_player_registration/screens/view-player-screen-template.dart';
+import 'package:amahoro_player_registration/screens/view-player-cards-screen.dart';
+import 'package:amahoro_player_registration/screens/view-player-screen.dart';
 import 'package:amahoro_player_registration/theme/colors.dart';
 import 'package:amahoro_player_registration/theme/textStyles.dart';
 import 'package:flutter/material.dart';
@@ -53,11 +54,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   int _selectedIndex = 0;
 
-  List<String> titles = ['Add Player', 'View Player'];
+  List<String> titles = ['Add Player', 'Player Cards',]; //'Player List'
 
   static const List<Widget> _screens = <Widget>[
     AddPlayerScreen(),
-    ViewPlayerScreenT(),
+    ViewPlayerCards(),
+    //ViewPlayerScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -85,8 +87,12 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.image_search),
-            label: 'Show',
+            label: 'Player Cards',
           ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.list),
+          //   label: 'Player List',
+          // ),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: kAmahoroColor,
