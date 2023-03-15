@@ -183,7 +183,7 @@ class _ViewPlayerScreenTState extends State<ViewPlayerScreenT> {
             child: Center(
               child: Container(
                 decoration: BoxDecoration(
-                  image: DecorationImage(image: Image.asset('assets/images/template.jpeg').image,),
+                  image: DecorationImage(image: leagueTitleList[selectedLeague]['title']=='Kabuye YL' ? Image.asset('assets/images/templateKabu.jpeg').image : Image.asset('assets/images/templateKimi.jpeg').image,),
                   color: Colors.white,
                 ),
                 width: 453,
