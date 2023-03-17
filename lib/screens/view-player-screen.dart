@@ -178,67 +178,32 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
       shrinkWrap: true,
       separatorBuilder: (BuildContext context, int index) => const Divider(),
       itemBuilder: (BuildContext context, int index) {
-        ScreenshotController screenshotController = ScreenshotController();
-        Widget playerCard = Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: Column(
+        GestureDetector playerCard = GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SecondRoute(dataList[index], leagueTitleList[selectedLeague]["title"], teamsTitleList[selectedTeam]["title"])),
+            );
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row (
                 children: [
-                  Row (
-                    children: [
-                      Text(dataList[index]["firstName"],
-                          style: kDefaultTextStyle.copyWith(color: Colors.grey.shade800)),
-                      Text(' ',
-                          style: kDefaultTextStyle),
-                      Text(dataList[index]["lastName"],
-                          style: kDefaultTextStyle.copyWith(color: Colors.grey.shade800)),
-                    ],
-                  ),
+                  Text(dataList[index]["firstName"],
+                      style: kDefaultTextStyle.copyWith(color: Colors.grey.shade800)),
+                  Text(' ',
+                      style: kDefaultTextStyle),
+                  Text(dataList[index]["lastName"],
+                      style: kDefaultTextStyle.copyWith(color: Colors.grey.shade800)),
                 ],
               ),
-            ),
-            // Expanded(
-            //   flex: 1,
-            //   child: Container(
-            //     width: 200,
-            //     height: 240,
-            //     child: FutureBuilder(
-            //       future: downloadURL(dataList[index]["photoURL"]),
-            //       builder: (context, AsyncSnapshot<String> snapshot) {
-            //         if (snapshot.hasError) {
-            //           return const Icon(
-            //             Icons.person,
-            //             color: kAmahoroColorMaterial,
-            //           );
-            //         }
-            //         if (snapshot.connectionState ==
-            //             ConnectionState.done) {
-            //           return Center(
-            //             child: Container(
-            //               decoration: BoxDecoration(
-            //                 image: DecorationImage(
-            //                   image:
-            //                       Image.network(snapshot.data!).image,
-            //                   fit: BoxFit.cover,
-            //                 ),
-            //                 borderRadius: BorderRadius.circular(5),
-            //               ),
-            //               width: 180,
-            //               height: 220,
-            //             ),
-            //           );
-            //         }
-            //         return const Center(
-            //             child: CircularProgressIndicator());
-            //       },
-            //     ),
-            //   ),
-            // ),
-          ],
+              Icon(Icons.chevron_right),
+            ],
+          ),
         );
         playerCardList.add(playerCard);
-        screenshotControllerList.add(screenshotController);
         return playerCard;
       });
 
@@ -396,6 +361,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                         return const Center(child: CircularProgressIndicator());
                       },
                     ),
+                    BasicWidgets.buildTitle('Members'),
                     FutureBuilder(
                       future: getData(),
                       builder: (context, snapshot) {
@@ -409,7 +375,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                           playerCardList.clear();
                           playerList.sort((a, b) => a["firstName"].compareTo(b["firstName"]));
                           return playerList.isEmpty
-                              ? const Text('No Player found')
+                              ? Center(child: const Text('No Members registered'))
                               : buildItems(playerList);
                         }
                         return const Center(child: CircularProgressIndicator());
@@ -511,5 +477,101 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
       playerCardtemp.clear();
     }
     return playercardRows;
+  }
+}
+
+class SecondRoute extends StatelessWidget {
+  Map<String, dynamic> playerInfo;
+  String teamName;
+  String leagueName;
+
+  SecondRoute(this.playerInfo, this.leagueName, this.teamName, {Key? key}) : super(key: key);
+
+  Future<String> downloadURL(String storageRef) async {
+    String downloadURL = await storage.ref(storageRef).getDownloadURL();
+    return downloadURL;
+  }
+
+  firebase_storage.FirebaseStorage storage =
+      firebase_storage.FirebaseStorage.instance;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Player Info"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+        child: Center(
+          child: Column(
+            children: [
+              FutureBuilder(
+                future: downloadURL(playerInfo["photoURL"]),
+                builder: (context, AsyncSnapshot<String> snapshot) {
+                  if (snapshot.hasError) {
+                    return const Icon(
+                      Icons.person,
+                      color: kAmahoroColorMaterial,
+                    );
+                  }
+                  if (snapshot.connectionState ==
+                      ConnectionState.done) {
+                    return Center(
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Center(
+                              child: CircleAvatar(
+                                radius: 110,
+                                backgroundColor: kAmahoroColorMaterial,
+                                child: CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  backgroundImage: Image.network(snapshot.data!).image,
+                                  radius: 105,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  return const Center(
+                      child: CircularProgressIndicator());
+                },
+              ),
+              Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      BasicWidgets.buildTitle('League'),
+                      Text(leagueName),
+                      const SizedBox(height: 10),
+                      BasicWidgets.buildTitle('Team'),
+                      Text(teamName),
+                      const SizedBox(height: 10),
+                      BasicWidgets.buildTitle('First Name'),
+                      Text(playerInfo["firstName"]),
+                      const SizedBox(height: 10),
+                      BasicWidgets.buildTitle('Last Name'),
+                      Text(playerInfo["lastName"]),
+                      const SizedBox(height: 10),
+                      BasicWidgets.buildTitle('Birthday'),
+                      Text(
+                          DateFormat('dd.MM.yyyy').format(
+                              DateTime.fromMillisecondsSinceEpoch(
+                                  playerInfo["birthday"]))),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

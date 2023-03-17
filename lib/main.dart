@@ -52,19 +52,28 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  int _selectedIndex = 0;
+  int _selectedIndexMobile = 0;
+  int _selectedIndexDesktop = 0;
 
-  List<String> titles = ['Add Player', 'Player Cards',]; //'Player List'
+  List<String> titlesMobile = ['Add Player', 'Player List',]; //'Player Cards'
+  List<String> titlesDesktop = ['Add Player', 'Player List', 'Player Cards']; //'Player Cards'
 
-  static const List<Widget> _screens = <Widget>[
+  static const List<Widget> _screensMobile = <Widget>[
+    AddPlayerScreen(),
+    ViewPlayerScreen(),
+  ];
+
+  static const List<Widget> _screensDesktop = <Widget>[
     AddPlayerScreen(),
     ViewPlayerCards(),
-    //ViewPlayerScreen(),
+    ViewPlayerScreen(),
   ];
 
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;
+      MediaQuery.of(context).size.width>1100 ?
+      _selectedIndexDesktop = index :
+      _selectedIndexMobile = index;
     });
   }
 
@@ -72,15 +81,15 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(titles[_selectedIndex], style: kDefaultTextStyle.copyWith(color: Colors.white),),
+        title: Text(MediaQuery.of(context).size.width>1100 ? titlesDesktop[_selectedIndexDesktop] : titlesMobile[_selectedIndexMobile], style: kDefaultTextStyle.copyWith(color: Colors.white),),
       ),
       body: Center(
-        child: _screens.elementAt(_selectedIndex),
+        child: MediaQuery.of(context).size.width>1100 ? _screensDesktop.elementAt(_selectedIndexDesktop) : _screensMobile.elementAt(_selectedIndexMobile),
       ),
       bottomNavigationBar: BottomNavigationBar(
         selectedLabelStyle: kDefaultTextStyle11pt,
         unselectedLabelStyle: kDefaultTextStyle11pt,
-        items: const <BottomNavigationBarItem>[
+        items: MediaQuery.of(context).size.width>1100 ? const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.add),
             label: 'Add',
@@ -89,12 +98,23 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: Icon(Icons.image_search),
             label: 'Player Cards',
           ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.list),
-          //   label: 'Player List',
-          // ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'Player List',
+          ),
+        ] : const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add),
+            label: 'Add',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'Player List',
+          ),
         ],
-        currentIndex: _selectedIndex,
+        currentIndex: MediaQuery.of(context).size.width>1100 ?
+        _selectedIndexDesktop :
+        _selectedIndexMobile,
         selectedItemColor: kAmahoroColor,
         onTap: _onItemTapped,
       ),
