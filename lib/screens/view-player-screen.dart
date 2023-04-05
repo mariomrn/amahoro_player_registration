@@ -1,13 +1,11 @@
-import 'dart:html' as html;
+
 import 'dart:typed_data';
+import 'package:amahoro_player_registration/screens/player-detail-screen.dart';
 import 'package:amahoro_player_registration/screens/widgets/basicWidgets.dart';
-import 'package:amahoro_player_registration/theme/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:intl/intl.dart';
-import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import '../theme/textStyles.dart';
 import 'package:screenshot/screenshot.dart';
@@ -42,6 +40,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
   String docID3 = "";
   late Future _futureGetInitial;
   List playerList = [];
+  List playerDocumentList = [];
   List<Widget> playerCardList = [];
   List<ScreenshotController> screenshotControllerList = [];
   final pdf = pw.Document();
@@ -139,7 +138,6 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
   }
 
   Future getData() async {
-    print(docID3);
     playerList.clear();
     if (docID3.isEmpty) {
       return null;
@@ -156,8 +154,10 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
           .then((querySnapshot) {
         for (var result in querySnapshot.docs) {
           playerList.add(result.data());
+          playerDocumentList.add(result.id);
         }
       });
+      print(playerList);
       return playerList;
     } catch (e) {
       debugPrint("Error - $e");
@@ -183,7 +183,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SecondRoute(dataList[index], leagueTitleList[selectedLeague]["title"], teamsTitleList[selectedTeam]["title"])),
+              MaterialPageRoute(builder: (context) => SecondRoute(dataList[index], playerDocumentList[index], leagueTitleList[selectedLeague]["title"], teamsTitleList[selectedTeam]["title"], leagueDocumentList[selectedLeague], seasonsDocumentList[selectedSeason], teamsDocumentList[selectedTeam], teamsTitleList, teamsDocumentList,)),
             );
           },
           child: Row(
@@ -373,7 +373,6 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
                         if (snapshot.connectionState == ConnectionState.done) {
                           screenshotControllerList.clear();
                           playerCardList.clear();
-                          playerList.sort((a, b) => a["firstName"].compareTo(b["firstName"]));
                           return playerList.isEmpty
                               ? Center(child: const Text('No Members registered'))
                               : buildItems(playerList);
@@ -391,187 +390,5 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
     );
   }
 
-  savePDF() async {
-    Uint8List pdfInBytes = await pdf.save();
-    final blob = html.Blob([pdfInBytes], 'application/pdf');
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    html.AnchorElement anchorElement = html.AnchorElement(href: url);
-    anchorElement.download = url;
-    anchorElement.click();
-  }
-
   List<Uint8List> playerCardImages = [];
-  capturePlayerCards() async {
-    playerCardImages.clear();
-    for (ScreenshotController screenshotController
-        in screenshotControllerList) {
-      await screenshotController
-          .capture()
-          .then((value) => playerCardImages.add(value!));
-    }
-    print('length ' + playerCardImages.length.toString());
-    return playerCardImages;
-  }
-
-  createPDF() async {
-    await capturePlayerCards().then(
-      (capturedImage) {
-        pdf.addPage(
-          pw.Page(
-            pageFormat: PdfPageFormat.a4,
-            build: (context) {
-              return pw.Column(
-                children: buildRows(),
-              );
-            },
-          ),
-        );
-      },
-    ).then((value) => savePDF());
-  }
-
-  List<pw.Row> buildRows() {
-    List<pw.Row> playercardRows = [];
-    List<Uint8List> playerCardtemp = [];
-    for (var playerCardImage in playerCardImages) {
-      playerCardtemp.add(playerCardImage);
-      if (playerCardtemp.length > 1) {
-        playercardRows.add(
-          pw.Row(
-            children: [
-              for (var playercardimage in playerCardtemp)
-                pw.Center(
-                  child: pw.Container(
-                    height: 100,
-                    width: 250,
-                    child: pw.Image(
-                      pw.MemoryImage(playercardimage),
-                      fit: pw.BoxFit.contain,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        );
-        playerCardtemp.clear();
-      }
-    }
-    if (playerCardtemp.isNotEmpty) {
-      playercardRows.add(
-        pw.Row(
-          children: [
-            for (var playercardimage in playerCardtemp)
-              pw.Center(
-                child: pw.Container(
-                  height: 100,
-                  width: 250,
-                  child: pw.Image(
-                    pw.MemoryImage(playercardimage),
-                    fit: pw.BoxFit.contain,
-                  ),
-                ),
-              ),
-          ],
-        ),
-      );
-      playerCardtemp.clear();
-    }
-    return playercardRows;
-  }
-}
-
-class SecondRoute extends StatelessWidget {
-  Map<String, dynamic> playerInfo;
-  String teamName;
-  String leagueName;
-
-  SecondRoute(this.playerInfo, this.leagueName, this.teamName, {Key? key}) : super(key: key);
-
-  Future<String> downloadURL(String storageRef) async {
-    String downloadURL = await storage.ref(storageRef).getDownloadURL();
-    return downloadURL;
-  }
-
-  firebase_storage.FirebaseStorage storage =
-      firebase_storage.FirebaseStorage.instance;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Player Info"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-        child: Center(
-          child: Column(
-            children: [
-              FutureBuilder(
-                future: downloadURL(playerInfo["photoURL"]),
-                builder: (context, AsyncSnapshot<String> snapshot) {
-                  if (snapshot.hasError) {
-                    return const Icon(
-                      Icons.person,
-                      color: kAmahoroColorMaterial,
-                    );
-                  }
-                  if (snapshot.connectionState ==
-                      ConnectionState.done) {
-                    return Center(
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Center(
-                              child: CircleAvatar(
-                                radius: 110,
-                                backgroundColor: kAmahoroColorMaterial,
-                                child: CircleAvatar(
-                                  backgroundColor: Colors.white,
-                                  backgroundImage: Image.network(snapshot.data!).image,
-                                  radius: 105,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                  return const Center(
-                      child: CircularProgressIndicator());
-                },
-              ),
-              Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      BasicWidgets.buildTitle('League'),
-                      Text(leagueName),
-                      const SizedBox(height: 10),
-                      BasicWidgets.buildTitle('Team'),
-                      Text(teamName),
-                      const SizedBox(height: 10),
-                      BasicWidgets.buildTitle('First Name'),
-                      Text(playerInfo["firstName"]),
-                      const SizedBox(height: 10),
-                      BasicWidgets.buildTitle('Last Name'),
-                      Text(playerInfo["lastName"]),
-                      const SizedBox(height: 10),
-                      BasicWidgets.buildTitle('Birthday'),
-                      Text(
-                          DateFormat('dd.MM.yyyy').format(
-                              DateTime.fromMillisecondsSinceEpoch(
-                                  playerInfo["birthday"]))),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }

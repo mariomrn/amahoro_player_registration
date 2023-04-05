@@ -455,8 +455,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
     String firstName = firstNameController.text;
     String lastName = lastNameController.text;
     int birthday = selectedDate.millisecondsSinceEpoch;
-    String storageRef =
-        'players/$docID1/${firstName + lastName + birthday.toString()}';
+    String storageRef = 'players/$docID1/${firstName + lastName + birthday.toString()}';
     await storage.ref(storageRef).putData(imageBytes!);
     return leagueCollectionRef
         .doc(docID1)
