@@ -34811,11 +34811,11 @@ av(){var s=t.s
 return new A.D9(A.b(["Add Player","Player List"],s),A.b(["Add Player","Player List","Player Cards"],s),B.j)}}
 A.D9.prototype={
 a5G(a){this.a7(new A.agu(this,a))},
-M(a,b){var s,r,q,p,o=this,n=null,m=t.w,l=b.O(m).f.a.a>1100?o.r[o.e]:o.f[o.d]
+M(a,b){var s,r,q,p,o=this,n=null,m=t.w,l=b.O(m).f.a.a>1?o.r[o.e]:o.f[o.d]
 l=A.ar5(A.aK(l,n,n,n,$.ci().bo(B.i),n,n))
-s=A.eK(b.O(m).f.a.a>1100?B.IP[o.e]:B.Fj[o.d],n,n)
+s=A.eK(b.O(m).f.a.a>1?B.IP[o.e]:B.Fj[o.d],n,n)
 r=$.azh()
-q=b.O(m).f.a.a>1100?B.Jd:B.EV
+q=b.O(m).f.a.a>1?B.Jd:B.EV
 m=b.O(m).f.a.a>1100?o.e:o.d
 p=$.Fl()
 if(p==null)p=n
@@ -35519,7 +35519,7 @@ return A.H($async$vp,r)},
 aan(){var s,r,q,p,o,n,m,l=null,k=A.b([],t.Nb),j=A.b([],t.XE)
 for(s=this.r1,r=s.length,q=t.n_,p=0;p<s.length;s.length===r||(0,A.B)(s),++p){j.push(s[p])
 if(j.length>1){o=A.b([],q)
-for(n=j.length,m=0;m<j.length;j.length===n||(0,A.B)(j),++m)o.push(new A.wo(B.fe,l,l,A.arA(new A.xR(A.at5(j[m]),B.m1),100,250)))
+for(n=j.length,m=0;m<j.length;j.length===n||(0,A.B)(j),++m)o.push(new A.wo(B.fe,l,l,A.arA(new A.xR(A.at5(j[m]),B.m1),200,500)))
 k.push(A.atT(o))
 B.d.sm(j,0)}}if(j.length!==0){s=A.b([],q)
 for(r=j.length,p=0;p<j.length;j.length===r||(0,A.B)(j),++p)s.push(new A.wo(B.fe,l,l,A.arA(new A.xR(A.at5(j[p]),B.m1),100,250)))
