@@ -81,15 +81,15 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(MediaQuery.of(context).size.width>1100 ? titlesDesktop[_selectedIndexDesktop] : titlesMobile[_selectedIndexMobile], style: kDefaultTextStyle.copyWith(color: Colors.white),),
+        title: Text(MediaQuery.of(context).size.width>1 ? titlesDesktop[_selectedIndexDesktop] : titlesMobile[_selectedIndexMobile], style: kDefaultTextStyle.copyWith(color: Colors.white),),
       ),
       body: Center(
-        child: MediaQuery.of(context).size.width>1100 ? _screensDesktop.elementAt(_selectedIndexDesktop) : _screensMobile.elementAt(_selectedIndexMobile),
+        child: MediaQuery.of(context).size.width>1 ? _screensDesktop.elementAt(_selectedIndexDesktop) : _screensMobile.elementAt(_selectedIndexMobile),
       ),
       bottomNavigationBar: BottomNavigationBar(
         selectedLabelStyle: kDefaultTextStyle11pt,
         unselectedLabelStyle: kDefaultTextStyle11pt,
-        items: MediaQuery.of(context).size.width>1100 ? const <BottomNavigationBarItem>[
+        items: MediaQuery.of(context).size.width>1 ? const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.add),
             label: 'Add',
