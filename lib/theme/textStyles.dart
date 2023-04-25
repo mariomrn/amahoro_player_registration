@@ -19,14 +19,14 @@ TextStyle kDefaultTextStyle15pt = GoogleFonts.inter(
 );
 
 
-TextStyle kPlayerCardLeagueTS = GoogleFonts.patrickHand(
-  textStyle: TextStyle(fontSize: 35, letterSpacing: 2, fontWeight: FontWeight.w700, color: kAmahoroColor),
+TextStyle kPlayerCardLeagueTS = GoogleFonts.inter(
+  textStyle: TextStyle(fontSize: 30, letterSpacing: 2, fontWeight: FontWeight.w500, color: kAmahoroColor),
 );
 
-TextStyle kPlayerCardSubtitleTS = GoogleFonts.patrickHand(
-  textStyle: TextStyle(fontSize: 20, letterSpacing: 1, fontWeight: FontWeight.w700, color: Colors.black54),
+TextStyle kPlayerCardSubtitleTS = GoogleFonts.inter(
+  textStyle: TextStyle(fontSize: 15, letterSpacing: 1, fontWeight: FontWeight.w500, color: Colors.black),
 );
 
-TextStyle kPlayerCardTextTS = GoogleFonts.patrickHand(
-  textStyle: TextStyle(fontSize: 22, letterSpacing: 1, fontWeight: FontWeight.w800, color: Colors.black54),
+TextStyle kPlayerCardTextTS = GoogleFonts.inter(
+  textStyle: TextStyle(fontSize: 15, letterSpacing: 0, fontWeight: FontWeight.w500, color: Colors.black),
 );

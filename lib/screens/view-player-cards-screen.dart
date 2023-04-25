@@ -222,7 +222,7 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
                                         dataList[index]["birthday"]).day - 1)),
                                     style:
                                     kPlayerCardTextTS),
-                                SizedBox(height: 15,),
+                                SizedBox(height: 5,),
                               ],
                             ),
                           ),
@@ -231,39 +231,49 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
                     ),
                     Expanded(
                       flex: 23,
-                      child: Container(
-                        width: 200,
-                        height: 240,
-                        child: FutureBuilder(
-                          future: downloadURL(dataList[index]["photoURL"]),
-                          builder: (context, AsyncSnapshot<String> snapshot) {
-                            if (snapshot.hasError) {
-                              return const Icon(
-                                Icons.person,
-                                color: kAmahoroColorMaterial,
-                              );
-                            }
-                            if (snapshot.connectionState ==
-                                ConnectionState.done) {
-                              return Center(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image:
-                                          Image.network(snapshot.data!).image,
-                                      fit: BoxFit.cover,
-                                    ),
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  width: 170,
-                                  height: 220,
-                                ),
-                              );
-                            }
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          },
-                        ),
+                      child: Column(
+                        children: [
+                          Expanded(
+                              flex: 1, child: Container()),
+                          Expanded(
+                            flex: 30,
+                            child: Container(
+                              width: 260,
+                              height: 300,
+                              child: FutureBuilder(
+                                future: downloadURL(dataList[index]["photoURL"]),
+                                builder: (context, AsyncSnapshot<String> snapshot) {
+                                  if (snapshot.hasError) {
+                                    return const Icon(
+                                      Icons.person,
+                                      color: kAmahoroColorMaterial,
+                                    );
+                                  }
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.done) {
+                                    return Center(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            border: Border.all(color: Colors.black, width: 5),
+                                          image: DecorationImage(
+                                            image:
+                                                Image.network(snapshot.data!).image,
+                                            fit: BoxFit.cover,
+                                          ),
+                                          borderRadius: BorderRadius.circular(5),
+                                        ),
+                                        width: 180,
+                                        height: 240,
+                                      ),
+                                    );
+                                  }
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     Expanded(
