@@ -71,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onItemTapped(int index) {
     setState(() {
-      MediaQuery.of(context).size.width>1100 ?
+      MediaQuery.of(context).size.width>1 ?
       _selectedIndexDesktop = index :
       _selectedIndexMobile = index;
     });
