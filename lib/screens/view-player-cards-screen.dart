@@ -504,11 +504,11 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
     //capturePlayerCards macht die ganzen widgets und speichert sie in playerCardImages
     await capturePlayerCards().then(
       (capturedImage) {
-        for(var i = 0; i < playerCardImages.length/10.ceil(); i++){
+        for(var i = 0; i < playerCardImages.length/5.ceil(); i++){
           List<Uint8List> tenImages = [];
-          for(var k = 0; k <10; k++){
-            if (playerCardImages.length > k+10*i) {
-              tenImages.add(playerCardImages[k+10*i]);
+          for(var k = 0; k <5; k++){
+            if (playerCardImages.length > k+5*i) {
+              tenImages.add(playerCardImages[k+5*i]);
             }
           }
           //10 persos passen auf eine seite
@@ -535,7 +535,7 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
       // der temp liste wird ein playercard geaddet
       playerCardtemp.add(playerCardImage);
       // player card temp macht zwei spalten
-      if (playerCardtemp.length > 1) {
+      if (true) {
         playercardRows.add(
           pw.Row(
             children: [
@@ -556,7 +556,7 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
         playerCardtemp.clear();
       }
     }
-    if (playerCardtemp.isNotEmpty) {
+    if (false) {
       playercardRows.add(
         pw.Row(
           children: [
