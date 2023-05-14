@@ -183,7 +183,12 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
             child: Center(
               child: Container(
                 decoration: BoxDecoration(
-                  image: DecorationImage(image: leagueTitleList[selectedLeague]['title']=='Kabuye YL' ? Image.asset('assets/images/templateKabu.jpeg').image : Image.asset('assets/images/templateKimi.jpeg').image,),
+                  image: DecorationImage(
+                    image: leagueTitleList[selectedLeague]['title'] ==
+                            'Kabuye YL'
+                        ? Image.asset('assets/images/templateKabu.jpeg').image
+                        : Image.asset('assets/images/templateKimi.jpeg').image,
+                  ),
                   color: Colors.white,
                 ),
                 width: 453,
@@ -195,8 +200,9 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
                       child: Column(
                         children: [
                           Expanded(
-                              flex: 2, child: Container(),
-                              ),
+                            flex: 2,
+                            child: Container(),
+                          ),
                           Expanded(
                             flex: 4,
                             child: Column(
@@ -212,17 +218,27 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
                                             dataList[index]["birthday"])),
                                     style:
                                         kPlayerCardTextTS), //dataList[index]["birthday"]
-                                Text(teamsTitleList[selectedTeam]['title'],
-                                style: kPlayerCardTextTS,),
+                                Text(
+                                  teamsTitleList[selectedTeam]['title'],
+                                  style: kPlayerCardTextTS,
+                                ),
                                 Text(
                                     DateFormat('dd.MM.yyyy').format(DateTime(
                                         DateTime.fromMillisecondsSinceEpoch(
-                                            dataList[index]["birthday"]).year + 17, DateTime.fromMillisecondsSinceEpoch(
-                                        dataList[index]["birthday"]).month, DateTime.fromMillisecondsSinceEpoch(
-                                        dataList[index]["birthday"]).day - 1)),
-                                    style:
-                                    kPlayerCardTextTS),
-                                SizedBox(height: 5,),
+                                                    dataList[index]["birthday"])
+                                                .year +
+                                            17,
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                                dataList[index]["birthday"])
+                                            .month,
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                                    dataList[index]["birthday"])
+                                                .day -
+                                            1)),
+                                    style: kPlayerCardTextTS),
+                                SizedBox(
+                                  height: 5,
+                                ),
                               ],
                             ),
                           ),
@@ -233,16 +249,17 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
                       flex: 23,
                       child: Column(
                         children: [
-                          Expanded(
-                              flex: 1, child: Container()),
+                          Expanded(flex: 1, child: Container()),
                           Expanded(
                             flex: 30,
                             child: Container(
                               width: 260,
                               height: 300,
                               child: FutureBuilder(
-                                future: downloadURL(dataList[index]["photoURL"]),
-                                builder: (context, AsyncSnapshot<String> snapshot) {
+                                future:
+                                    downloadURL(dataList[index]["photoURL"]),
+                                builder:
+                                    (context, AsyncSnapshot<String> snapshot) {
                                   if (snapshot.hasError) {
                                     return const Icon(
                                       Icons.person,
@@ -254,13 +271,15 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
                                     return Center(
                                       child: Container(
                                         decoration: BoxDecoration(
-                                            border: Border.all(color: Colors.black, width: 5),
+                                          border: Border.all(
+                                              color: Colors.black, width: 5),
                                           image: DecorationImage(
-                                            image:
-                                                Image.network(snapshot.data!).image,
+                                            image: Image.network(snapshot.data!)
+                                                .image,
                                             fit: BoxFit.cover,
                                           ),
-                                          borderRadius: BorderRadius.circular(5),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
                                         ),
                                         width: 180,
                                         height: 240,
@@ -504,11 +523,11 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
     //capturePlayerCards macht die ganzen widgets und speichert sie in playerCardImages
     await capturePlayerCards().then(
       (capturedImage) {
-        for(var i = 0; i < playerCardImages.length/10.ceil(); i++){
+        for (var i = 0; i < playerCardImages.length / 5.ceil(); i++) {
           List<Uint8List> tenImages = [];
-          for(var k = 0; k <10; k++){
-            if (playerCardImages.length > k+10*i) {
-              tenImages.add(playerCardImages[k+10*i]);
+          for (var k = 0; k < 5; k++) {
+            if (playerCardImages.length > k + 5 * i) {
+              tenImages.add(playerCardImages[k + 10 * i]);
             }
           }
           //10 persos passen auf eine seite
@@ -535,28 +554,6 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
       // der temp liste wird ein playercard geaddet
       playerCardtemp.add(playerCardImage);
       // player card temp macht zwei spalten
-      if (playerCardtemp.length > 1) {
-        playercardRows.add(
-          pw.Row(
-            children: [
-              for (var playercardimage in playerCardtemp)
-                pw.Center(
-                  child: pw.Container(
-                    width: 400,
-                    height: 400,
-                    child: pw.Image(
-                      pw.MemoryImage(playercardimage),
-                      fit: pw.BoxFit.contain,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        );
-        playerCardtemp.clear();
-      }
-    }
-    if (playerCardtemp.isNotEmpty) {
       playercardRows.add(
         pw.Row(
           children: [
