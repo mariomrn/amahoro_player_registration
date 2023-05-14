@@ -542,7 +542,7 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
               for (var playercardimage in playerCardtemp)
                 pw.Center(
                   child: pw.Container(
-                    width: 400,
+                    width: 600,
                     height: 400,
                     child: pw.Image(
                       pw.MemoryImage(playercardimage),
