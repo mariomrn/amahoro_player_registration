@@ -543,7 +543,7 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
                 pw.Center(
                   child: pw.Container(
                     height: 300,
-                    width: 500,
+                    width: 300,
                     child: pw.Image(
                       pw.MemoryImage(playercardimage),
                       fit: pw.BoxFit.contain,
@@ -564,7 +564,7 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
               pw.Center(
                 child: pw.Container(
                   height: 300,
-                  width: 500,
+                  width: 300,
                   child: pw.Image(
                     pw.MemoryImage(playercardimage),
                     fit: pw.BoxFit.contain,
