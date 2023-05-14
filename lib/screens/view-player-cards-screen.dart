@@ -501,27 +501,40 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
   }
 
   createPDF() async {
+    //capturePlayerCards macht die ganzen widgets und speichert sie in playerCardImages
     await capturePlayerCards().then(
       (capturedImage) {
-        pdf.addPage(
-          pw.Page(
-            pageFormat: PdfPageFormat.a4,
-            build: (context) {
-              return pw.Column(
-                children: buildRows(),
-              );
-            },
-          ),
-        );
+        for(var i = 0; i < playerCardImages.length/10.ceil(); i++){
+          List<Uint8List> tenImages = [];
+          for(var k = 0; k <10; k++){
+            if (playerCardImages.length > k+10*i) {
+              tenImages.add(playerCardImages[k+10*i]);
+            }
+          }
+          //10 persos passen auf eine seite
+          pdf.addPage(
+            pw.Page(
+              pageFormat: PdfPageFormat.a4,
+              build: (context) {
+                return pw.Column(
+                  children: buildRows(tenImages),
+                );
+              },
+            ),
+          );
+        }
       },
     ).then((value) => savePDF());
   }
 
-  List<pw.Row> buildRows() {
+  List<pw.Row> buildRows(List<Uint8List> tenImages) {
     List<pw.Row> playercardRows = [];
     List<Uint8List> playerCardtemp = [];
-    for (var playerCardImage in playerCardImages) {
+    // über die playerCardImages wird iteriert
+    for (var playerCardImage in tenImages) {
+      // der temp liste wird ein playercard geaddet
       playerCardtemp.add(playerCardImage);
+      // player card temp macht zwei spalten
       if (playerCardtemp.length > 1) {
         playercardRows.add(
           pw.Row(
@@ -529,8 +542,8 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
               for (var playercardimage in playerCardtemp)
                 pw.Center(
                   child: pw.Container(
-                    height: 200,
-                    width: 500,
+                    height: 150,
+                    width: 250,
                     child: pw.Image(
                       pw.MemoryImage(playercardimage),
                       fit: pw.BoxFit.contain,
@@ -550,7 +563,7 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
             for (var playercardimage in playerCardtemp)
               pw.Center(
                 child: pw.Container(
-                  height: 100,
+                  height: 150,
                   width: 250,
                   child: pw.Image(
                     pw.MemoryImage(playercardimage),
