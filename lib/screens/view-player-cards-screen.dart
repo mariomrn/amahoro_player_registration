@@ -44,7 +44,7 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
   List playerList = [];
   List<Widget> playerCardList = [];
   List<ScreenshotController> screenshotControllerList = [];
-  final pdf = pw.Document();
+  var pdf = pw.Document();
 
   @override
   void initState() {
@@ -496,7 +496,7 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
           .capture()
           .then((value) => playerCardImages.add(value!));
     }
-    print('length ' + playerCardImages.length.toString());
+    print('Wir sind hier: length ' + playerCardImages.length.toString());
     return playerCardImages;
   }
 
@@ -511,6 +511,8 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
               tenImages.add(playerCardImages[k+5*i]);
             }
           }
+          //new
+          pdf = pw.Document();
           //10 persos passen auf eine seite
           pdf.addPage(
             pw.Page(
