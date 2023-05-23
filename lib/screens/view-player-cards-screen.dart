@@ -501,6 +501,7 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
   }
 
   createPDF() async {
+    pdf = pw.Document();
     //capturePlayerCards macht die ganzen widgets und speichert sie in playerCardImages
     await capturePlayerCards().then(
       (capturedImage) {
@@ -512,7 +513,6 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
             }
           }
           //new
-          pdf = pw.Document();
           //10 persos passen auf eine seite
           pdf.addPage(
             pw.Page(
