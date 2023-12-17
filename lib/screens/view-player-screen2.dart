@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/widgets.dart' as pw;
+import '../theme/colors.dart';
 import '../theme/textStyles.dart';
 import 'package:screenshot/screenshot.dart';
 
@@ -215,21 +216,74 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
               ],
               borderRadius: BorderRadius.circular(8),
             ),
-            child: ListTile(
-              title: Row(
+            child: Container(
+              height: 120, // Adjust the height according to your design
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    dataList[index]["firstName"],
+                  Container(
+                    height: 100,
+                    width: 100,
+                    child: FutureBuilder(
+                      future: downloadURL(dataList[index]["photoURL"]),
+                      builder: (context, AsyncSnapshot<String> snapshot) {
+                        if (snapshot.hasError) {
+                          return const Icon(
+                            Icons.person,
+                            color: kAmahoroColorMaterial,
+                          );
+                        }
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          return Center(
+                            child: CircleAvatar(
+                              backgroundColor: Colors.black,
+                              radius: 47,
+                              child: CircleAvatar(
+                                backgroundColor: Colors.white,
+                                backgroundImage: Image.network(snapshot.data!).image,
+                                radius: 45, // Adjust the radius according to your design
+                              ),
+                            ),
+                          );
+                        }
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                    ),
                   ),
-                  Text(' ', style: kDefaultTextStyle),
-                  Text(
-                    dataList[index]["lastName"],
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              dataList[index]["firstName"],
+                              style: kNameTS,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              dataList[index]["lastName"],
+                              style: kNameTS,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          DateFormat('dd.MM.yyyy').format(
+                            DateTime.fromMillisecondsSinceEpoch(
+                              dataList[index]["birthday"],
+                            ),
+                          ),
+                          style: kBirthdayTS,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
-              subtitle: Text(DateFormat('dd.MM.yyyy').format(
-                  DateTime.fromMillisecondsSinceEpoch(
-                      dataList[index]["birthday"]))),
             ),
           ),
         );

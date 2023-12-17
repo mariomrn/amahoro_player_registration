@@ -24,6 +24,12 @@ TextStyle kTeamSelectionTextStyle = GoogleFonts.inter(
   textStyle: TextStyle(letterSpacing: -1.0, fontSize: 17, fontWeight: FontWeight.w600, color: kAmahoroColor),
 );
 
+TextStyle kNameTS = GoogleFonts.inter(
+  textStyle: const TextStyle(fontSize: 20, letterSpacing: -1.0, fontWeight: FontWeight.w600, color: Color(0xff211814)),
+);
+TextStyle kBirthdayTS = GoogleFonts.inter(
+  textStyle: const TextStyle(fontSize: 18, letterSpacing: -1.0, fontWeight: FontWeight.w500, color: Color(0xff211814)),
+);
 
 TextStyle kPlayerCardLeagueTS = GoogleFonts.inter(
   textStyle: TextStyle(fontSize: 30, letterSpacing: 2, fontWeight: FontWeight.w500, color: kAmahoroColor),
