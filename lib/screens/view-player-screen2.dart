@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 import 'package:amahoro_player_registration/screens/player-detail-screen.dart';
-import 'package:amahoro_player_registration/screens/widgets/basicWidgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
@@ -242,11 +241,11 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                     }
                     if (snapshot.connectionState == ConnectionState.done) {
                       return DropdownButton(
-                        underline: Container(
-                        ),
+                        underline: Container(),
                         iconEnabledColor: Colors.transparent,
                         value: currentSeason,
-                        style: kDefaultTextStyle15pt.copyWith(color: Color(0xff413028)),
+                        style: kDefaultTextStyle15pt.copyWith(
+                            color: Color(0xff413028)),
                         items: seasonsTitleList
                             .map<DropdownMenuItem<String>>((dynamic listitem) {
                           return DropdownMenuItem<String>(
@@ -256,7 +255,8 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                         }).toList(),
                         onChanged: (String? value) {
                           // Find the index of the selected item's title in seasonsTitleList
-                          int selectedIndex = seasonsTitleList.indexWhere((item) => item['title'] == value);
+                          int selectedIndex = seasonsTitleList
+                              .indexWhere((item) => item['title'] == value);
 
                           // Do something with the index (e.g., save it to a variable)
                           setState(() {
@@ -272,66 +272,80 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                 ),
               ],
             ),
+            SizedBox(height: 20,),
+            FutureBuilder(
+              future: _futureGetInitial,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return const Text(
+                    "Something went wrong",
+                  );
+                }
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                        children: teamsTitleList.isEmpty
+                            ? [const Text('No Teams')]
+                            : List<Widget>.generate(
+                                teamsTitleList.length,
+                                (int index) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          color: selectedTeam == index ? const Color(0xff211814) : Colors.transparent,
+                                          width: selectedTeam == index ? 3.0 : 0.0, // Thickness of the border
+                                        ),
+                                      ),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(2.0),
+                                      child: ChoiceChip(
+                                        disabledColor: const Color(0x00211814),
+                                        selectedColor: const Color(0x00211814),
+                                        labelStyle: selectedTeam == index
+                                            ? kTeamSelectionTextStyle.copyWith(
+                                                color: const Color(0xff211814), fontWeight: FontWeight.w700,)
+                                            : kTeamSelectionTextStyle.copyWith(
+                                                color: Colors.grey.shade500),
+                                        backgroundColor: const Color(0x00211814),
+                                        label:
+                                            Text(teamsTitleList[index]['title']),
+                                        selected: selectedTeam == index,
+                                        onSelected: (bool selected) {
+                                          setState(() {
+                                            selectedTeam = index;
+                                            print('before' + docID3);
+                                            docID3 =
+                                                teamsDocumentList[selectedTeam];
+                                            print('after' + docID3);
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ).toList()),
+                  );
+                }
+                return const Center(child: CircularProgressIndicator());
+              },
+            ),
+            Container(height: 2, decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Color(0xff211814),
+                  width: 2.0, // Thickness of the border
+                ),
+              ),
+            ),),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    BasicWidgets.buildTitle('Teams'),
-                    FutureBuilder(
-                      future: _futureGetInitial,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasError) {
-                          return const Text(
-                            "Something went wrong",
-                          );
-                        }
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          return SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                                children: teamsTitleList.isEmpty
-                                    ? [const Text('No Teams')]
-                                    : List<Widget>.generate(
-                                  teamsTitleList.length,
-                                      (int index) {
-                                    return Padding(
-                                      padding: const EdgeInsets.all(2.0),
-                                      child: ChoiceChip(
-                                        selectedColor:
-                                        const Color.fromRGBO(
-                                            163, 119, 101, 1),
-                                        labelStyle: selectedTeam == index
-                                            ? kDefaultTextStyle.copyWith(
-                                            color: Colors.white)
-                                            : kDefaultTextStyle.copyWith(
-                                            color:
-                                            Colors.grey.shade600),
-                                        backgroundColor:
-                                        Colors.grey.shade200,
-                                        label: Text(teamsTitleList[index]
-                                        ['title']),
-                                        selected: selectedTeam == index,
-                                        onSelected: (bool selected) {
-                                          setState(() {
-                                            selectedTeam = index;
-                                            print('before' + docID3);
-                                            docID3 = teamsDocumentList[
-                                            selectedTeam];
-                                            print('after' + docID3);
-                                          });
-                                        },
-                                      ),
-                                    );
-                                  },
-                                ).toList()),
-                          );
-                        }
-                        return const Center(child: CircularProgressIndicator());
-                      },
-                    ),
-                    BasicWidgets.buildTitle('Members'),
                     FutureBuilder(
                       future: getData(),
                       builder: (context, snapshot) {
@@ -345,7 +359,7 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                           playerCardList.clear();
                           return playerList.isEmpty
                               ? Center(
-                              child: const Text('No Members registered'))
+                                  child: const Text('No Members registered'))
                               : buildItems(playerList);
                         }
                         return const Center(child: CircularProgressIndicator());

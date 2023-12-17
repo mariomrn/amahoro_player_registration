@@ -20,6 +20,9 @@ TextStyle kDefaultTextStyle15pt = GoogleFonts.inter(
 TextStyle kDefaultTextStyleHeader = GoogleFonts.inter(
   textStyle: const TextStyle(fontSize: 40, fontWeight: FontWeight.w600, color: Color(0xff211814)),
 );
+TextStyle kTeamSelectionTextStyle = GoogleFonts.inter(
+  textStyle: TextStyle(letterSpacing: -1.0, fontSize: 17, fontWeight: FontWeight.w600, color: kAmahoroColor),
+);
 
 
 TextStyle kPlayerCardLeagueTS = GoogleFonts.inter(
