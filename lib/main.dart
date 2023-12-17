@@ -1,6 +1,7 @@
 import 'package:amahoro_player_registration/screens/add-player-screen.dart';
 import 'package:amahoro_player_registration/screens/view-player-cards-screen.dart';
 import 'package:amahoro_player_registration/screens/view-player-screen.dart';
+import 'package:amahoro_player_registration/screens/view-player-screen2.dart';
 import 'package:amahoro_player_registration/theme/colors.dart';
 import 'package:amahoro_player_registration/theme/textStyles.dart';
 import 'package:flutter/material.dart';
@@ -52,18 +53,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  int _selectedIndexMobile = 0;
   int _selectedIndexDesktop = 0;
 
-  List<String> titlesMobile = ['Add Player', 'Player List',]; //'Player Cards'
-  List<String> titlesDesktop = ['Add Player', 'Player List', 'Player Cards']; //'Player Cards'
-
-  static const List<Widget> _screensMobile = <Widget>[
-    AddPlayerScreen(),
-    ViewPlayerScreen(),
-  ];
-
   static const List<Widget> _screensDesktop = <Widget>[
+    ViewPlayerScreen2(),
     AddPlayerScreen(),
     ViewPlayerCards(),
     ViewPlayerScreen(),
@@ -71,25 +64,25 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onItemTapped(int index) {
     setState(() {
-      MediaQuery.of(context).size.width>1 ?
-      _selectedIndexDesktop = index :
-      _selectedIndexMobile = index;
+      _selectedIndexDesktop = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(MediaQuery.of(context).size.width>1 ? titlesDesktop[_selectedIndexDesktop] : titlesMobile[_selectedIndexMobile], style: kDefaultTextStyle.copyWith(color: Colors.white),),
-      ),
       body: Center(
-        child: MediaQuery.of(context).size.width>1 ? _screensDesktop.elementAt(_selectedIndexDesktop) : _screensMobile.elementAt(_selectedIndexMobile),
+        child: _screensDesktop.elementAt(_selectedIndexDesktop),
       ),
       bottomNavigationBar: BottomNavigationBar(
         selectedLabelStyle: kDefaultTextStyle11pt,
         unselectedLabelStyle: kDefaultTextStyle11pt,
-        items: MediaQuery.of(context).size.width>1 ? const <BottomNavigationBarItem>[
+        type: BottomNavigationBarType.fixed,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.landscape),
+            label: 'Kimisagara',
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add),
             label: 'Add',
@@ -102,19 +95,8 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: Icon(Icons.list),
             label: 'Player List',
           ),
-        ] : const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: 'Add',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'Player List',
-          ),
         ],
-        currentIndex: MediaQuery.of(context).size.width>1100 ?
-        _selectedIndexDesktop :
-        _selectedIndexMobile,
+        currentIndex: _selectedIndexDesktop,
         selectedItemColor: kAmahoroColor,
         onTap: _onItemTapped,
       ),
