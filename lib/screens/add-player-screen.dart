@@ -4,6 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:amahoro_player_registration/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import '../theme/textStyles.dart';
@@ -311,13 +312,16 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                   ),
                 ],
               ),
-              BasicWidgets.buildTitle('First Name'),
-              TextField(
-                controller: firstNameController,
-              ),
               BasicWidgets.buildTitle('Last Name'),
               TextField(
                 controller: lastNameController,
+                  inputFormatters: [
+                    UpperCaseTextFormatter(),
+                  ]
+              ),
+              BasicWidgets.buildTitle('First Name'),
+              TextField(
+                controller: firstNameController,
               ),
               BasicWidgets.buildTitle('Date Of Birth'),
               Row(
@@ -557,5 +561,15 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
       debugPrint("Error - $e");
       return null;
     }
+  }
+}
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
+    );
   }
 }
