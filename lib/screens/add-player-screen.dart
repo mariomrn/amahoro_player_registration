@@ -2,11 +2,11 @@ import 'dart:typed_data';
 import 'package:amahoro_player_registration/screens/widgets/basicWidgets.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:amahoro_player_registration/theme/colors.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import '../theme/textStyles.dart';
 
 class AddPlayerScreen extends StatefulWidget {
@@ -24,7 +24,6 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
       firebase_storage.FirebaseStorage.instance;
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
-  DateTime selectedDate = DateTime.now();
   bool dateGotSelected = false;
   XFile? pickedImage;
   Uint8List? imageBytes;
@@ -41,21 +40,8 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
   String docID2 = "";
   String docID3 = "";
   late Future _futureGetInitial;
-
-  _selectDate(BuildContext context) async {
-    final DateTime? selected = await showDatePicker(
-      context: context,
-      initialDate: DateTime(2004),
-      firstDate: DateTime(1980),
-      lastDate: DateTime(2025),
-    );
-    if (selected != null && selected != selectedDate) {
-      setState(() {
-        dateGotSelected = true;
-        selectedDate = selected;
-      });
-    }
-  }
+  DateTime date = DateTime(2016, 10, 26);
+  DateTime birthdayDate = DateTime.now();
 
   @override
   void initState() {
@@ -93,8 +79,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                         return Padding(
                           padding: const EdgeInsets.all(2.0),
                           child: ChoiceChip(
-                            selectedColor:
-                            kAmahoroColorMaterial.shade700,
+                            selectedColor: kAmahoroColorMaterial.shade700,
                             labelStyle: selectedLeague == index
                                 ? kDefaultTextStyle.copyWith(
                                     color: Colors.white)
@@ -132,7 +117,8 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                           children: List<Widget>.generate(
-                        seasonsTitleList.length, //seasonsTitleList.length + 1 for the add choice chip to appear
+                        seasonsTitleList
+                            .length, //seasonsTitleList.length + 1 for the add choice chip to appear
                         (int index) {
                           if (index == seasonsTitleList.length) {
                             return Padding(
@@ -165,8 +151,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                           return Padding(
                             padding: const EdgeInsets.all(2.0),
                             child: ChoiceChip(
-                              selectedColor:
-                              kAmahoroColorMaterial.shade700,
+                              selectedColor: kAmahoroColorMaterial.shade700,
                               labelStyle: selectedSeason == index
                                   ? kDefaultTextStyle.copyWith(
                                       color: Colors.white)
@@ -205,7 +190,8 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                           children: List<Widget>.generate(
-                        teamsTitleList.length, //teamsTitleList.length + 1 for the add choice chip to appear
+                        teamsTitleList
+                            .length, //teamsTitleList.length + 1 for the add choice chip to appear
                         (int index) {
                           if (index == teamsTitleList.length) {
                             return Padding(
@@ -240,8 +226,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                           return Padding(
                             padding: const EdgeInsets.all(2.0),
                             child: ChoiceChip(
-                              selectedColor:
-                              kAmahoroColorMaterial.shade700,
+                              selectedColor: kAmahoroColorMaterial.shade700,
                               labelStyle: selectedTeam == index
                                   ? kDefaultTextStyle.copyWith(
                                       color: Colors.white)
@@ -295,12 +280,16 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                   TextButton(
                     child: Text(
                       'Add Photo',
-                      style: kDefaultTextStyle.copyWith(color: kAmahoroColorMaterial.shade700),
+                      style: kDefaultTextStyle.copyWith(
+                          color: kAmahoroColorMaterial.shade700),
                     ),
                     onPressed: () async {
                       final ImagePicker _picker = ImagePicker();
                       pickedImage = await _picker.pickImage(
-                          source: ImageSource.camera, maxHeight: 640, maxWidth: 480, imageQuality: 80);
+                          source: ImageSource.camera,
+                          maxHeight: 640,
+                          maxWidth: 480,
+                          imageQuality: 80);
                       if (pickedImage == null) {
                         return;
                       }
@@ -313,69 +302,74 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                 ],
               ),
               BasicWidgets.buildTitle('Last Name'),
-              TextField(
-                controller: lastNameController,
-                  inputFormatters: [
-                    UpperCaseTextFormatter(),
-                  ]
-              ),
+              TextField(controller: lastNameController, inputFormatters: [
+                UpperCaseTextFormatter(),
+              ]),
               BasicWidgets.buildTitle('First Name'),
               TextField(
                 controller: firstNameController,
               ),
               BasicWidgets.buildTitle('Date Of Birth'),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    dateGotSelected
-                        ? DateFormat('dd.MM.yyyy').format(selectedDate)
-                        : 'no date selected',
-                    style: kDefaultTextStyle.copyWith(
-                        color: dateGotSelected
-                            ? Colors.grey.shade900
-                            : Colors.grey.shade500),
-                  ),
-                  TextButton(
-                    child: Text(
-                      'Choose Birthday',
-                      style: kDefaultTextStyle.copyWith(color: kAmahoroColorMaterial.shade700),
+              //This is the new date picker carousel and replaces old crusty google date picker
+              CupertinoButton(
+                // Display a CupertinoDatePicker in date picker mode.
+                onPressed: () {
+                  _showDateDialog(
+                    CupertinoDatePicker(
+                      dateOrder: DatePickerDateOrder.dmy,
+                      initialDateTime: date,
+                      mode: CupertinoDatePickerMode.date,
+                      use24hFormat: true,
+                      // This is called when the user changes the date.
+                      onDateTimeChanged: (DateTime newDate) {
+                        setState(() => birthdayDate = newDate);
+                      },
                     ),
-                    onPressed: () {
-                      _selectDate(context);
-                    },
-                  ),
-                ],
+                  );
+                  dateGotSelected = true;
+                },
+                child: Text(
+                  dateGotSelected
+                      ? '${birthdayDate.day}.${birthdayDate.month}.${birthdayDate.year}'
+                      : 'no date selected',
+                  style: kDefaultTextStyle.copyWith(
+                      color: dateGotSelected
+                          ? Colors.grey.shade900
+                          : Colors.grey.shade500),
+                ),
               ),
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12.0, vertical: 30),
                 child: Row(
                   children: [
-                    _inProgress ? Container() : Expanded(
-                      child: Container(
-                        height:40,
-                        child: TextButton(
-                          style: TextButton.styleFrom(
-                            primary: informationIsComplete()
-                                ? Colors.white
-                                : Colors.grey.shade600,
-                            backgroundColor: informationIsComplete()
-                                ? kAmahoroColorMaterial.shade700
-                                : Colors.grey.shade400,
+                    _inProgress
+                        ? Container()
+                        : Expanded(
+                            child: Container(
+                              height: 40,
+                              child: TextButton(
+                                style: TextButton.styleFrom(
+                                  primary: informationIsComplete()
+                                      ? Colors.white
+                                      : Colors.grey.shade600,
+                                  backgroundColor: informationIsComplete()
+                                      ? kAmahoroColorMaterial.shade700
+                                      : Colors.grey.shade400,
+                                ),
+                                child: Text(
+                                  'Submit Player',
+                                  style: kDefaultTextStyle.copyWith(
+                                      color: Colors.white),
+                                ),
+                                onPressed: informationIsComplete()
+                                    ? () {
+                                        addPlayer();
+                                      }
+                                    : null,
+                              ),
+                            ),
                           ),
-                          child: Text(
-                            'Submit Player',
-                            style: kDefaultTextStyle.copyWith(color: Colors.white),
-                          ),
-                          onPressed: informationIsComplete()
-                              ? () {
-                                  addPlayer();
-                                }
-                              : null,
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -389,7 +383,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
   void resetValues() {
     firstNameController.clear();
     lastNameController.clear();
-    selectedDate = DateTime.now();
+    birthdayDate = DateTime.now();
     dateGotSelected = false;
     pickedImage = null;
     imageBytes = null;
@@ -401,6 +395,28 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
         lastNameController.text.isNotEmpty &&
         (imageBytes != null) &&
         docID3.length > 1;
+  }
+
+  void _showDateDialog(Widget child) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => Container(
+        height: 216,
+        padding: const EdgeInsets.only(top: 6.0),
+        // The Bottom margin is provided to align the popup above the system
+        // navigation bar.
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        // Provide a background color for the popup.
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        // Use a SafeArea widget to avoid system overlaps.
+        child: SafeArea(
+          top: false,
+          child: child,
+        ),
+      ),
+    );
   }
 
   Future<dynamic> buildShowDialog(BuildContext context, String title,
@@ -458,8 +474,9 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
     print(docID3);
     String firstName = firstNameController.text;
     String lastName = lastNameController.text;
-    int birthday = selectedDate.millisecondsSinceEpoch;
-    String storageRef = 'players/$docID1/${firstName + lastName + birthday.toString()}';
+    int birthday = birthdayDate.millisecondsSinceEpoch;
+    String storageRef =
+        'players/$docID1/${firstName + lastName + birthday.toString()}';
     await storage.ref(storageRef).putData(imageBytes!);
     return leagueCollectionRef
         .doc(docID1)
@@ -566,7 +583,8 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
 
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
     return TextEditingValue(
       text: newValue.text.toUpperCase(),
       selection: newValue.selection,
