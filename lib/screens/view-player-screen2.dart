@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:intl/intl.dart';
 import 'package:pdf/widgets.dart' as pw;
 import '../theme/textStyles.dart';
 import 'package:screenshot/screenshot.dart';
@@ -31,7 +32,7 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
   int selectedSeason = 0;
   int selectedTeam = 0;
   late String currentLeague;
-  late String currentSeason;
+  String currentSeason = "Placeholder";
   late String currentTeam;
   String docID1 = "SCj8y26uZv0o5HVffb4j";
   String docID2 = "1SVxOxjFnOHZzAKhRJ0y";
@@ -42,10 +43,13 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
   List<Widget> playerCardList = [];
   List<ScreenshotController> screenshotControllerList = [];
   final pdf = pw.Document();
+  IconData sortingIcon = Icons.history;
 
   @override
   void initState() {
     super.initState();
+    selectedLeague = 0; // Set the initial league
+    selectedSeason = 0; // Set the initial season
     playerList.clear();
     _futureGetInitial = getInitial();
   }
@@ -93,10 +97,13 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
         }
       });
       setState(() {
-        docID2 = seasonsDocumentList[selectedSeason];
-        currentSeason = seasonsTitleList[selectedSeason]['title'];
-        getTeams(docID1, docID2);
+        if (seasonsTitleList.isNotEmpty) {
+          docID2 = seasonsDocumentList[selectedSeason];
+          currentSeason = seasonsTitleList[selectedSeason]['title'];
+          getTeams(docID1, docID2);
+        }
       });
+
       return seasonsTitleList;
     } catch (e) {
       debugPrint("Error - $e");
@@ -174,7 +181,7 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
       itemCount: dataList.length,
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
-      separatorBuilder: (BuildContext context, int index) => const Divider(),
+      separatorBuilder: (BuildContext context, int index) => Container(height: 10,),
       itemBuilder: (BuildContext context, int index) {
         GestureDetector playerCard = GestureDetector(
           behavior: HitTestBehavior.opaque,
@@ -195,22 +202,35 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                       )),
             );
           },
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 2,
+                  offset: Offset(0, 3),
+                ),
+              ],
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: ListTile(
+              title: Row(
                 children: [
-                  Text(dataList[index]["firstName"],
-                      style: kDefaultTextStyle.copyWith(
-                          color: Colors.grey.shade800)),
+                  Text(
+                    dataList[index]["firstName"],
+                  ),
                   Text(' ', style: kDefaultTextStyle),
-                  Text(dataList[index]["lastName"],
-                      style: kDefaultTextStyle.copyWith(
-                          color: Colors.grey.shade800)),
+                  Text(
+                    dataList[index]["lastName"],
+                  ),
                 ],
               ),
-              Icon(Icons.chevron_right),
-            ],
+              subtitle: Text(DateFormat('dd.MM.yyyy').format(
+                  DateTime.fromMillisecondsSinceEpoch(
+                      dataList[index]["birthday"]))),
+            ),
           ),
         );
         playerCardList.add(playerCard);
@@ -257,7 +277,6 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                           // Find the index of the selected item's title in seasonsTitleList
                           int selectedIndex = seasonsTitleList
                               .indexWhere((item) => item['title'] == value);
-
                           // Do something with the index (e.g., save it to a variable)
                           setState(() {
                             currentSeason = value!;
@@ -340,12 +359,56 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                 ),
               ),
             ),),
+            const SizedBox(height: 10,),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 16.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30.0),
+                              color: Colors.grey.shade200,
+                            ),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                hintText: 'Search...',
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16.0),
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.transparent, // Set the border color
+                              width: 2, // Adjust the border width as needed
+                            ), // You can change the color as needed
+                          ),
+                          child: IconButton(
+                            icon: Icon(sortingIcon, color: Colors.brown,),
+                            onPressed: () {
+                              setState(() {
+                                if (sortingIcon == Icons.history)
+                                  sortingIcon = Icons.sort_by_alpha;
+                                else
+                                  sortingIcon = Icons.history;
+                              });
+                              // Handle sorting button press
+                              print('Sorting button pressed');
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 16.0),
+                      ],
+                    ),
                     FutureBuilder(
                       future: getData(),
                       builder: (context, snapshot) {
@@ -358,8 +421,8 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                           screenshotControllerList.clear();
                           playerCardList.clear();
                           return playerList.isEmpty
-                              ? Center(
-                                  child: const Text('No Members registered'))
+                              ? const Center(
+                                  child: Text('No Members registered'))
                               : buildItems(playerList);
                         }
                         return const Center(child: CircularProgressIndicator());
