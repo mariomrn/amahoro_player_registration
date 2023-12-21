@@ -37,9 +37,9 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
   late String currentLeague;
   late String currentSeason;
   late String currentTeam;
-  String docID1 = "SCj8y26uZv0o5HVffb4j";
-  String docID2 = "1SVxOxjFnOHZzAKhRJ0y";
-  String docID3 = "";
+  late String leagueDocID; // = "SCj8y26uZv0o5HVffb4j";
+  late String seasonDocID; // = "1SVxOxjFnOHZzAKhRJ0y";
+  String teamDocID = "";
   late Future _futureGetInitial;
   List playerList = [];
   List<Widget> playerCardList = [];
@@ -67,11 +67,11 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
           leagueDocumentList.add(result.id);
           leagueTitleList.add(result.data());
         }
-        docID1 = leagueDocumentList[selectedLeague];
-        getSeasons(docID1);
+        leagueDocID = leagueDocumentList[selectedLeague];
+        getSeasons(leagueDocID);
         //currentLeague = leagueTitleList[selectedLeague];
       });
-      return docID1;
+      return leagueDocID;
     } catch (e) {
       debugPrint("Error - $e");
       return null;
@@ -96,9 +96,9 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
         }
       });
       setState(() {
-        docID2 = seasonsDocumentList[selectedSeason];
+        seasonDocID = seasonsDocumentList[selectedSeason];
         //selectedSeason = seasonsTitleList[selectedSeason];
-        getTeams(docID1, docID2);
+        getTeams(leagueDocID, seasonDocID);
       });
       return seasonsTitleList;
     } catch (e) {
@@ -107,16 +107,16 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
     }
   }
 
-  Future getTeams(String docID1, String docID2) async {
+  Future getTeams(String leagueDocID, String seasonDocID) async {
     try {
       playerList.clear();
       teamsTitleList.clear();
       teamsDocumentList.clear();
-      docID3 = '';
+      teamDocID = '';
       await leagueCollectionRef
-          .doc(docID1)
+          .doc(leagueDocID)
           .collection('season')
-          .doc(docID2)
+          .doc(seasonDocID)
           .collection('teams')
           .get()
           .then((querySnapshot) {
@@ -128,10 +128,10 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
       });
       setState(() {
         if (teamsDocumentList.isNotEmpty) {
-          docID3 = teamsDocumentList[selectedTeam];
+          teamDocID = teamsDocumentList[selectedTeam];
         }
       });
-      return docID3;
+      return teamDocID;
     } catch (e) {
       debugPrint("Error - $e");
       return null;
@@ -139,18 +139,18 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
   }
 
   Future getData() async {
-    print(docID3);
+    print(teamDocID);
     playerList.clear();
-    if (docID3.isEmpty) {
+    if (teamDocID.isEmpty) {
       return null;
     }
     try {
       await leagueCollectionRef
-          .doc(docID1)
+          .doc(leagueDocID)
           .collection('season')
-          .doc(docID2)
+          .doc(seasonDocID)
           .collection('teams')
-          .doc(docID3)
+          .doc(teamDocID)
           .collection('players')
           .get()
           .then((querySnapshot) {
@@ -183,7 +183,12 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
             child: Center(
               child: Container(
                 decoration: BoxDecoration(
-                  image: DecorationImage(image: leagueTitleList[selectedLeague]['title']=='Kabuye YL' ? Image.asset('assets/images/templateKabu.jpeg').image : Image.asset('assets/images/templateKimi.jpeg').image,),
+                  image: DecorationImage(
+                    image: leagueTitleList[selectedLeague]['title'] ==
+                            'Kabuye YL'
+                        ? Image.asset('assets/images/templateKabu.jpeg').image
+                        : Image.asset('assets/images/templateKimi.jpeg').image,
+                  ),
                   color: Colors.white,
                 ),
                 width: 453,
@@ -195,8 +200,9 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
                       child: Column(
                         children: [
                           Expanded(
-                              flex: 2, child: Container(),
-                              ),
+                            flex: 2,
+                            child: Container(),
+                          ),
                           Expanded(
                             flex: 4,
                             child: Column(
@@ -212,17 +218,27 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
                                             dataList[index]["birthday"])),
                                     style:
                                         kPlayerCardTextTS), //dataList[index]["birthday"]
-                                Text(teamsTitleList[selectedTeam]['title'],
-                                style: kPlayerCardTextTS,),
+                                Text(
+                                  teamsTitleList[selectedTeam]['title'],
+                                  style: kPlayerCardTextTS,
+                                ),
                                 Text(
                                     DateFormat('dd.MM.yyyy').format(DateTime(
                                         DateTime.fromMillisecondsSinceEpoch(
-                                            dataList[index]["birthday"]).year + 17, DateTime.fromMillisecondsSinceEpoch(
-                                        dataList[index]["birthday"]).month, DateTime.fromMillisecondsSinceEpoch(
-                                        dataList[index]["birthday"]).day - 1)),
-                                    style:
-                                    kPlayerCardTextTS),
-                                SizedBox(height: 5,),
+                                                    dataList[index]["birthday"])
+                                                .year +
+                                            17,
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                                dataList[index]["birthday"])
+                                            .month,
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                                    dataList[index]["birthday"])
+                                                .day -
+                                            1)),
+                                    style: kPlayerCardTextTS),
+                                SizedBox(
+                                  height: 5,
+                                ),
                               ],
                             ),
                           ),
@@ -233,16 +249,17 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
                       flex: 23,
                       child: Column(
                         children: [
-                          Expanded(
-                              flex: 1, child: Container()),
+                          Expanded(flex: 1, child: Container()),
                           Expanded(
                             flex: 30,
                             child: Container(
                               width: 260,
                               height: 300,
                               child: FutureBuilder(
-                                future: downloadURL(dataList[index]["photoURL"]),
-                                builder: (context, AsyncSnapshot<String> snapshot) {
+                                future:
+                                    downloadURL(dataList[index]["photoURL"]),
+                                builder:
+                                    (context, AsyncSnapshot<String> snapshot) {
                                   if (snapshot.hasError) {
                                     return const Icon(
                                       Icons.person,
@@ -254,13 +271,15 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
                                     return Center(
                                       child: Container(
                                         decoration: BoxDecoration(
-                                            border: Border.all(color: Colors.black, width: 5),
+                                          border: Border.all(
+                                              color: Colors.black, width: 5),
                                           image: DecorationImage(
-                                            image:
-                                                Image.network(snapshot.data!).image,
+                                            image: Image.network(snapshot.data!)
+                                                .image,
                                             fit: BoxFit.cover,
                                           ),
-                                          borderRadius: BorderRadius.circular(5),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
                                         ),
                                         width: 180,
                                         height: 240,
@@ -329,8 +348,8 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
                             selected: selectedLeague == index,
                             onSelected: (bool selected) {
                               setState(() {
-                                docID1 = leagueDocumentList[index];
-                                getSeasons(docID1);
+                                leagueDocID = leagueDocumentList[index];
+                                getSeasons(leagueDocID);
                                 selectedLeague = index;
                               });
                             },
@@ -373,8 +392,8 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
                               selected: selectedSeason == index,
                               onSelected: (bool selected) {
                                 setState(() {
-                                  docID2 = seasonsDocumentList[index];
-                                  getTeams(docID1, docID2);
+                                  seasonDocID = seasonsDocumentList[index];
+                                  getTeams(leagueDocID, seasonDocID);
                                   selectedSeason = index;
                                 });
                               },
@@ -422,10 +441,10 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
                                         onSelected: (bool selected) {
                                           setState(() {
                                             selectedTeam = index;
-                                            print('before' + docID3);
-                                            docID3 =
+                                            print('before' + teamDocID);
+                                            teamDocID =
                                                 teamsDocumentList[selectedTeam];
-                                            print('after' + docID3);
+                                            print('after' + teamDocID);
                                           });
                                         },
                                       ),
@@ -505,11 +524,11 @@ class _ViewPlayerCardsState extends State<ViewPlayerCards> {
     //capturePlayerCards macht die ganzen widgets und speichert sie in playerCardImages
     await capturePlayerCards().then(
       (capturedImage) {
-        for(var i = 0; i < playerCardImages.length/5.ceil(); i++){
+        for (var i = 0; i < playerCardImages.length / 5.ceil(); i++) {
           List<Uint8List> tenImages = [];
-          for(var k = 0; k <5; k++){
-            if (playerCardImages.length > k+5*i) {
-              tenImages.add(playerCardImages[k+5*i]);
+          for (var k = 0; k < 5; k++) {
+            if (playerCardImages.length > k + 5 * i) {
+              tenImages.add(playerCardImages[k + 5 * i]);
             }
           }
           //new
