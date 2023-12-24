@@ -25,8 +25,10 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
       firebase_storage.FirebaseStorage.instance;
   List leagueTitleList = [];
   List leagueDocumentList = [];
-  List seasonsTitleList = [];
-  List seasonsDocumentList = [];
+  //seasonList[].id = docID
+  //seasonList[].data()
+  List seasonsList = [];
+  //List seasonsDocumentList = [];
   List teamsTitleList = [];
   List teamsDocumentList = [];
   int selectedLeague = 0;
@@ -83,8 +85,9 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
   Future getSeasons(String docID) async {
     try {
       playerList.clear();
-      seasonsTitleList.clear();
-      seasonsDocumentList.clear();
+      seasonsList.clear();
+      //seasonsTitleList.clear();
+      //seasonsDocumentList.clear();
       teamsTitleList.clear();
       teamsDocumentList.clear();
       await leagueCollectionRef
@@ -93,19 +96,28 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
           .get()
           .then((querySnapshot) {
         for (var result in querySnapshot.docs) {
-          seasonsTitleList.add(result.data());
-          seasonsDocumentList.add(result.id);
+          seasonsList.add(result);
+          //seasonsDocumentList.add(result.id);
+          seasonsList.sort((b, a) {
+            final timestampA = a.data()['timestamp'];
+            final timestampB = b.data()['timestamp'];
+
+            // Compare timestamps
+            return timestampA.compareTo(timestampB);
+          });
         }
       });
       setState(() {
-        if (seasonsTitleList.isNotEmpty) {
-          docID2 = seasonsDocumentList[selectedSeason];
-          currentSeason = seasonsTitleList[selectedSeason]['title'];
+        if (seasonsList.isNotEmpty) {
+          print('seasonsList[0]');
+          print(seasonsList[0].data());
+          docID2 = seasonsList[selectedSeason].id;
+          currentSeason = seasonsList[selectedSeason].data()['title'];
           getTeams(docID1, docID2);
         }
       });
 
-      return seasonsTitleList;
+      return seasonsList;
     } catch (e) {
       debugPrint("Error - $e");
       return null;
@@ -196,7 +208,7 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                         leagueTitleList[selectedLeague]["title"],
                         teamsTitleList[selectedTeam]["title"],
                         leagueDocumentList[selectedLeague],
-                        seasonsDocumentList[selectedSeason],
+                    seasonsList[selectedSeason].id,
                         teamsDocumentList[selectedTeam],
                         teamsTitleList,
                         teamsDocumentList,
@@ -320,21 +332,20 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                         value: currentSeason,
                         style: kDefaultTextStyle15pt.copyWith(
                             color: Color(0xff413028)),
-                        items: seasonsTitleList
-                            .map<DropdownMenuItem<String>>((dynamic listitem) {
+                        items: seasonsList.map<DropdownMenuItem<String>>((season) {
+                          final title = season.data()['title']; // Adjust this based on your data structure
                           return DropdownMenuItem<String>(
-                            value: listitem['title'],
-                            child: Text(listitem['title']),
+                            value: title.toString(), // Assuming title is a String, adjust accordingly
+                            child: Text(title.toString()), // Assuming title is a String, adjust accordingly
                           );
                         }).toList(),
                         onChanged: (String? value) {
                           // Find the index of the selected item's title in seasonsTitleList
-                          int selectedIndex = seasonsTitleList
-                              .indexWhere((item) => item['title'] == value);
+                          int selectedIndex = seasonsList.indexWhere((season) => season.data()['title'] == value);
                           // Do something with the index (e.g., save it to a variable)
                           setState(() {
                             currentSeason = value!;
-                            docID2 = seasonsDocumentList[selectedIndex];
+                            docID2 = seasonsList[selectedIndex].id; // Adjust this based on your actual data structure
                             getTeams(docID1, docID2);
                           });
                         },
@@ -422,22 +433,7 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                   children: [
                     Row(
                       children: [
-                        Expanded(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 16.0),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30.0),
-                              color: Colors.grey.shade200,
-                            ),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                hintText: 'Search...',
-                                border: InputBorder.none,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16.0),
+                        const SizedBox(width: 8.0),
                         Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
@@ -461,6 +457,41 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                           ),
                         ),
                         const SizedBox(width: 16.0),
+                        Expanded(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 16.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30.0),
+                              color: Colors.grey.shade200,
+                            ),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                hintText: 'Search...',
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16.0),
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.brown,
+                            border: Border.all(
+                              color: Colors.transparent, // Set the border color
+                              width: 2, // Adjust the border width as needed
+                            ), // You can change the color as needed
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.add, color: Colors.white,),
+                            onPressed: () {
+                              setState(() {
+                              });
+                              print('Add button pressed');
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 8.0),
                       ],
                     ),
                     FutureBuilder(
