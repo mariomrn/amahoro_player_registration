@@ -65,11 +65,18 @@ flutter:
   assets:
     - assets/images/templateKimi.jpeg
     - assets/images/templateKabu.jpeg
+    - assets/images/Kimisagara-YL-Logo.png
+    - assets/images/Kabuye-YL-Logo.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  fonts:
+    - family: LilitaOne
+      fonts:
+        - asset: assets/fonts/LilitaOne-Regular.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:
