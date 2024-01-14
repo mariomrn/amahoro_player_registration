@@ -48,9 +48,6 @@ class _TeamSelectionPageState extends State<TeamSelectionPage> {
                   var selectedTeam =
                       teams.firstWhere((team) => team.id == newValue);
                   loadPlayerCards(selectedTeam.id, selectedTeam.name);
-
-                  //loadTeamData(newValue!); //ich möchte verhindern, dass erneut von firebase geladen wird
-                  //loadPlayerCards(newValue!);
                 });
               },
               items: teams.map<DropdownMenuItem<String>>((Team team) {
@@ -135,7 +132,6 @@ Future<List<Player>> fetchPlayers(
       .collection('players')
       .get();
 
-  //return playerSnapshot.docs.map((doc) => Player.fromSnapshot(doc)).toList();
   List<Player> players = [];
   for (var doc in playerSnapshot.docs) {
     var data = doc.data() as Map<String, dynamic>;
