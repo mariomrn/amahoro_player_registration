@@ -56,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndexDesktop = 0;
 
   static const List<Widget> _screensDesktop = <Widget>[
-    ViewPlayerScreen2(),
+    // ViewPlayerScreen2(),
     AddPlayerScreen(),
     ViewPlayerCards(),
     ViewPlayerScreen(),
@@ -79,10 +79,10 @@ class _MyHomePageState extends State<MyHomePage> {
         unselectedLabelStyle: kDefaultTextStyle11pt,
         type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.landscape),
-            label: 'Kimisagara',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.landscape),
+          //   label: 'Kimisagara',
+          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add),
             label: 'Add',
