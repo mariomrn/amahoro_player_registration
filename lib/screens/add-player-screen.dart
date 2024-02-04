@@ -310,7 +310,6 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                 controller: firstNameController,
               ),
               BasicWidgets.buildTitle('Date Of Birth'),
-              //This is the new date picker carousel and replaces old crusty google date picker
               CupertinoButton(
                 // Display a CupertinoDatePicker in date picker mode.
                 onPressed: () {

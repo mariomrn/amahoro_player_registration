@@ -2,13 +2,15 @@ import 'dart:typed_data';
 import 'package:amahoro_player_registration/screens/player-detail-screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/widgets.dart' as pw;
 import '../theme/colors.dart';
 import '../theme/textStyles.dart';
 import 'package:screenshot/screenshot.dart';
+
+import 'add-player-specific.dart';
 
 class ViewPlayerScreen2 extends StatefulWidget {
   const ViewPlayerScreen2({Key? key}) : super(key: key);
@@ -109,8 +111,6 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
       });
       setState(() {
         if (seasonsList.isNotEmpty) {
-          print('seasonsList[0]');
-          print(seasonsList[0].data());
           docID2 = seasonsList[selectedSeason].id;
           currentSeason = seasonsList[selectedSeason].data()['title'];
           getTeams(docID1, docID2);
@@ -175,7 +175,6 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
           playerDocumentList.add(result.id);
         }
       });
-      print(playerList);
       return playerList;
     } catch (e) {
       debugPrint("Error - $e");
@@ -194,7 +193,9 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
       itemCount: dataList.length,
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
-      separatorBuilder: (BuildContext context, int index) => Container(height: 10,),
+      separatorBuilder: (BuildContext context, int index) => Container(
+            height: 10,
+          ),
       itemBuilder: (BuildContext context, int index) {
         GestureDetector playerCard = GestureDetector(
           behavior: HitTestBehavior.opaque,
@@ -208,7 +209,7 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                         leagueTitleList[selectedLeague]["title"],
                         teamsTitleList[selectedTeam]["title"],
                         leagueDocumentList[selectedLeague],
-                    seasonsList[selectedSeason].id,
+                        seasonsList[selectedSeason].id,
                         teamsDocumentList[selectedTeam],
                         teamsTitleList,
                         teamsDocumentList,
@@ -223,7 +224,7 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                   color: Colors.grey.withOpacity(0.1),
                   spreadRadius: 1,
                   blurRadius: 2,
-                  offset: Offset(0, 3),
+                  offset: const Offset(0, 3),
                 ),
               ],
               borderRadius: BorderRadius.circular(8),
@@ -234,7 +235,7 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
+                  SizedBox(
                     height: 100,
                     width: 100,
                     child: FutureBuilder(
@@ -253,8 +254,10 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                               radius: 47,
                               child: CircleAvatar(
                                 backgroundColor: Colors.white,
-                                backgroundImage: Image.network(snapshot.data!).image,
-                                radius: 45, // Adjust the radius according to your design
+                                backgroundImage:
+                                    Image.network(snapshot.data!).image,
+                                radius:
+                                    45, // Adjust the radius according to your design
                               ),
                             ),
                           );
@@ -331,21 +334,27 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                         iconEnabledColor: Colors.transparent,
                         value: currentSeason,
                         style: kDefaultTextStyle15pt.copyWith(
-                            color: Color(0xff413028)),
-                        items: seasonsList.map<DropdownMenuItem<String>>((season) {
-                          final title = season.data()['title']; // Adjust this based on your data structure
+                            color: const Color(0xff413028)),
+                        items:
+                            seasonsList.map<DropdownMenuItem<String>>((season) {
+                          final title = season.data()[
+                              'title']; // Adjust this based on your data structure
                           return DropdownMenuItem<String>(
-                            value: title.toString(), // Assuming title is a String, adjust accordingly
-                            child: Text(title.toString()), // Assuming title is a String, adjust accordingly
+                            value: title
+                                .toString(), // Assuming title is a String, adjust accordingly
+                            child: Text(title
+                                .toString()), // Assuming title is a String, adjust accordingly
                           );
                         }).toList(),
                         onChanged: (String? value) {
                           // Find the index of the selected item's title in seasonsTitleList
-                          int selectedIndex = seasonsList.indexWhere((season) => season.data()['title'] == value);
+                          int selectedIndex = seasonsList.indexWhere(
+                              (season) => season.data()['title'] == value);
                           // Do something with the index (e.g., save it to a variable)
                           setState(() {
                             currentSeason = value!;
-                            docID2 = seasonsList[selectedIndex].id; // Adjust this based on your actual data structure
+                            docID2 = seasonsList[selectedIndex]
+                                .id; // Adjust this based on your actual data structure
                             getTeams(docID1, docID2);
                           });
                         },
@@ -356,7 +365,9 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                 ),
               ],
             ),
-            SizedBox(height: 20,),
+            const SizedBox(
+              height: 20,
+            ),
             FutureBuilder(
               future: _futureGetInitial,
               builder: (context, snapshot) {
@@ -378,8 +389,12 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                                     decoration: BoxDecoration(
                                       border: Border(
                                         bottom: BorderSide(
-                                          color: selectedTeam == index ? const Color(0xff211814) : Colors.transparent,
-                                          width: selectedTeam == index ? 3.0 : 0.0, // Thickness of the border
+                                          color: selectedTeam == index
+                                              ? const Color(0xff211814)
+                                              : Colors.transparent,
+                                          width: selectedTeam == index
+                                              ? 3.0
+                                              : 0.0, // Thickness of the border
                                         ),
                                       ),
                                     ),
@@ -390,20 +405,21 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                                         selectedColor: const Color(0x00211814),
                                         labelStyle: selectedTeam == index
                                             ? kTeamSelectionTextStyle.copyWith(
-                                                color: const Color(0xff211814), fontWeight: FontWeight.w700,)
+                                                color: const Color(0xff211814),
+                                                fontWeight: FontWeight.w700,
+                                              )
                                             : kTeamSelectionTextStyle.copyWith(
                                                 color: Colors.grey.shade500),
-                                        backgroundColor: const Color(0x00211814),
-                                        label:
-                                            Text(teamsTitleList[index]['title']),
+                                        backgroundColor:
+                                            const Color(0x00211814),
+                                        label: Text(
+                                            teamsTitleList[index]['title']),
                                         selected: selectedTeam == index,
                                         onSelected: (bool selected) {
                                           setState(() {
                                             selectedTeam = index;
-                                            print('before' + docID3);
                                             docID3 =
                                                 teamsDocumentList[selectedTeam];
-                                            print('after' + docID3);
                                           });
                                         },
                                       ),
@@ -416,15 +432,20 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                 return const Center(child: CircularProgressIndicator());
               },
             ),
-            Container(height: 2, decoration: const BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: Color(0xff211814),
-                  width: 2.0, // Thickness of the border
+            Container(
+              height: 2,
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Color(0xff211814),
+                    width: 2.0, // Thickness of the border
+                  ),
                 ),
               ),
-            ),),
-            const SizedBox(height: 10,),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -443,28 +464,31 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                             ), // You can change the color as needed
                           ),
                           child: IconButton(
-                            icon: Icon(sortingIcon, color: Colors.brown,),
+                            icon: Icon(
+                              sortingIcon,
+                              color: Colors.brown,
+                            ),
                             onPressed: () {
                               setState(() {
-                                if (sortingIcon == Icons.history)
+                                if (sortingIcon == Icons.history) {
                                   sortingIcon = Icons.sort_by_alpha;
-                                else
+                                } else {
                                   sortingIcon = Icons.history;
+                                }
                               });
-                              // Handle sorting button press
-                              print('Sorting button pressed');
                             },
                           ),
                         ),
                         const SizedBox(width: 16.0),
                         Expanded(
                           child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 16.0),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(30.0),
                               color: Colors.grey.shade200,
                             ),
-                            child: TextField(
+                            child: const TextField(
                               decoration: InputDecoration(
                                 hintText: 'Search...',
                                 border: InputBorder.none,
@@ -483,11 +507,15 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                             ), // You can change the color as needed
                           ),
                           child: IconButton(
-                            icon: const Icon(Icons.add, color: Colors.white,),
+                            icon: const Icon(
+                              Icons.add,
+                              color: Colors.white,
+                            ),
                             onPressed: () {
-                              setState(() {
-                              });
-                              print('Add button pressed');
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => APS(leagueDocumentList[selectedLeague], seasonsList[selectedSeason].id, teamsDocumentList[selectedTeam])),
+                              );
                             },
                           ),
                         ),
@@ -506,8 +534,12 @@ class _ViewPlayerScreenState2 extends State<ViewPlayerScreen2> {
                           screenshotControllerList.clear();
                           playerCardList.clear();
                           return playerList.isEmpty
-                              ? const Center(
-                                  child: Text('No Members registered'))
+                              ? Column(
+                                  children: const [
+                                    Center(
+                                        child: Text('No Members registered')),
+                                  ],
+                                )
                               : buildItems(playerList);
                         }
                         return const Center(child: CircularProgressIndicator());
