@@ -95,6 +95,7 @@ class _ViewPlayerScreenState extends State<ViewPlayerScreen> {
         }
       });
       setState(() {
+        selectedSeason = seasonsDocumentList.length-1;
         docID2 = seasonsDocumentList[selectedSeason];
         //selectedSeason = seasonsTitleList[selectedSeason];
         getTeams(docID1, docID2);

@@ -148,67 +148,67 @@ class SecondRoute extends StatelessWidget {
                         Text(selectedLeagueName),
                         const SizedBox(height: 10),
                         ListTile(
-                          onTap: () {
-                            showDialog<String>(
-                              context: context,
-                              builder: (BuildContext context) => Dialog(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      const Text('Add to another Team'),
-                                      const SizedBox(height: 15),
-                                      Column(
-                                        children: List<Widget>.generate(
-                                          teamsTitleList.length,
-                                          (int index) {
-                                            return Padding(
-                                              padding:
-                                                  const EdgeInsets.all(4.0),
-                                              child: TextButton(
-                                                  onPressed: () {
-                                                    savePlayer(
-                                                        selectedLeagueDoc,
-                                                        selectedSeasonDoc,
-                                                        teamsDocumentList[
-                                                            index],
-                                                        playerInfo["firstName"],
-                                                        playerInfo["lastName"],
-                                                        playerInfo["birthday"],
-                                                        playerInfo["photoURL"]);
-                                                    //TODO DELETE THIS PLAYER FROM CURRENT TEAM
-                                                    Navigator.pop(context);
-                                                  },
-                                                  style: TextButton.styleFrom(
-                                                    primary: teamsTitleList[
-                                                                    index]
-                                                                ['title'] ==
-                                                            selectedTeamName
-                                                        ? kAmahoroColor
-                                                        : Colors
-                                                            .grey, // Text Color
-                                                  ),
-                                                  child: Text(
-                                                      teamsTitleList[index]
-                                                          ['title'])),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Text('Cancel'),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
+                          // onTap: () {
+                          //   showDialog<String>(
+                          //     context: context,
+                          //     builder: (BuildContext context) => Dialog(
+                          //       child: Padding(
+                          //         padding: const EdgeInsets.all(8.0),
+                          //         child: Column(
+                          //           mainAxisSize: MainAxisSize.min,
+                          //           mainAxisAlignment: MainAxisAlignment.center,
+                          //           children: <Widget>[
+                          //             const Text('Add to another Team'),
+                          //             const SizedBox(height: 15),
+                          //             Column(
+                          //               children: List<Widget>.generate(
+                          //                 teamsTitleList.length,
+                          //                 (int index) {
+                          //                   return Padding(
+                          //                     padding:
+                          //                         const EdgeInsets.all(4.0),
+                          //                     child: TextButton(
+                          //                         onPressed: () {
+                          //                           savePlayer(
+                          //                               selectedLeagueDoc,
+                          //                               selectedSeasonDoc,
+                          //                               teamsDocumentList[
+                          //                                   index],
+                          //                               playerInfo["firstName"],
+                          //                               playerInfo["lastName"],
+                          //                               playerInfo["birthday"],
+                          //                               playerInfo["photoURL"]);
+                          //                           //TODO DELETE THIS PLAYER FROM CURRENT TEAM
+                          //                           Navigator.pop(context);
+                          //                         },
+                          //                         style: TextButton.styleFrom(
+                          //                           primary: teamsTitleList[
+                          //                                           index]
+                          //                                       ['title'] ==
+                          //                                   selectedTeamName
+                          //                               ? kAmahoroColor
+                          //                               : Colors
+                          //                                   .grey, // Text Color
+                          //                         ),
+                          //                         child: Text(
+                          //                             teamsTitleList[index]
+                          //                                 ['title'])),
+                          //                   );
+                          //                 },
+                          //               ),
+                          //             ),
+                          //             ElevatedButton(
+                          //               onPressed: () {
+                          //                 Navigator.pop(context);
+                          //               },
+                          //               child: const Text('Cancel'),
+                          //             ),
+                          //           ],
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   );
+                          // },
                           title: Text(selectedTeamName),
                           subtitle: Text('Team'),
                         ),

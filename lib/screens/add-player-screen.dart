@@ -191,7 +191,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                       child: Row(
                           children: List<Widget>.generate(
                         teamsTitleList
-                            .length, //teamsTitleList.length + 1 for the add choice chip to appear
+                            .length +1, //teamsTitleList.length + 1 for the add choice chip to appear
                         (int index) {
                           if (index == teamsTitleList.length) {
                             return Padding(
@@ -444,8 +444,7 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
                     .then((value) => tempController.dispose());
                 Navigator.pop(context);
                 setState(() {
-                  getLeagues().then((value1) => getSeasons(value1)
-                      .then((value2) => getTeams(value1, value2)));
+                  getLeagues();
                 });
               },
               child: Text('Add ' + title),
