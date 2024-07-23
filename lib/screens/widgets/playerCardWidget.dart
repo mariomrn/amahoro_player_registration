@@ -1,7 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'dart:typed_data';
 
-class PlayerCardWidget extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:intl/intl.dart';
+import 'package:screenshot/screenshot.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
+class PlayerCardWidget extends StatefulWidget {
   final Map<String, dynamic> playerData; // Spielerdaten
   final String teamName;
 
@@ -11,9 +19,46 @@ class PlayerCardWidget extends StatelessWidget {
     required this.teamName,
   }) : super(key: key);
 
+  //final GlobalKey<_PlayerCardWidgetState> repaintBoundaryKey = GlobalKey();
+
+  /*Future<Uint8List?> takeScreenshot() async {
+    return repaintBoundaryKey.currentState?.takeScreenshot();
+  }*/
+
+  @override
+  _PlayerCardWidgetState createState() => _PlayerCardWidgetState();
+}
+
+class _PlayerCardWidgetState extends State<PlayerCardWidget> {
+  /*Future<Uint8List?> takeScreenshot() async {
+    RenderRepaintBoundary? boundary = widget.repaintBoundaryKey.currentContext
+        ?.findRenderObject() as RenderRepaintBoundary?;
+    if (boundary != null) {
+      ui.Image image = await boundary.toImage();
+      ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      return byteData?.buffer.asUint8List();
+    }
+    return null;
+  }*/
+
+  /* @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+      Uint8List? imageBytes = await takeScreenshot();
+      if (imageBytes != null) {
+        // Verarbeiten Sie den Screenshot wie erforderlich
+      }
+    });
+  }*/
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return /*RepaintBoundary(
+      key: widget.repaintBoundaryKey,
+      child: */
+        SafeArea(
       child: Center(
         child: AspectRatio(
           aspectRatio: 1.585, // Verhältnis für die Karte
@@ -59,31 +104,31 @@ class PlayerCardWidget extends StatelessWidget {
                           SizedBox(height: 4.0 * widthScale),
                           CardField(
                               label: 'FAMILY NAME',
-                              data: playerData['lastName'] ?? '',
+                              data: widget.playerData['lastName'] ?? '',
                               scale:
                                   widthScale), //hier kommt inhalt von firebase
                           CardField(
                               label: 'FIRST NAME',
-                              data: playerData['firstName'] ?? '',
+                              data: widget.playerData['firstName'] ?? '',
                               scale:
                                   widthScale), //hier kommt inhalt von firebase
                           CardField(
                               label: 'DATE OF BIRTH',
                               data: DateFormat('dd.MM.yyyy')
-                                  .format(playerData['birthday'] ?? ''),
+                                  .format(widget.playerData['birthday'] ?? ''),
                               scale:
                                   widthScale), //hier kommt inhalt von firebase
                           CardField(
                               label: 'TEAM',
-                              data: teamName, //playerData['teamName'],
+                              data: widget.teamName, //playerData['teamName'],
                               scale:
                                   widthScale), //hier kommt inhalt von firebase
                           CardField(
                               label: 'VALID UNTIL',
                               data: DateFormat('dd.MM.yyyy').format(DateTime(
-                                  playerData['birthday'].year + 17,
-                                  playerData['birthday'].month,
-                                  playerData['birthday'].day - 1)),
+                                  widget.playerData['birthday'].year + 17,
+                                  widget.playerData['birthday'].month,
+                                  widget.playerData['birthday'].day - 1)),
                               scale:
                                   widthScale), //hier kommt inhalt von firebase
                           SizedBox(height: 4.0 * widthScale),
@@ -91,7 +136,7 @@ class PlayerCardWidget extends StatelessWidget {
                       ),
                     ),
                     PhotoContainer(
-                      photoUrl: playerData['photoURL'] ?? '', // Foto-URL
+                      photoUrl: widget.playerData['photoURL'] ?? '', // Foto-URL
                       scale: widthScale,
                     ),
                   ],
@@ -101,6 +146,7 @@ class PlayerCardWidget extends StatelessWidget {
           ),
         ),
       ),
+      //),
     );
   }
 }
@@ -108,7 +154,7 @@ class PlayerCardWidget extends StatelessWidget {
 class HeaderWithLogo extends StatelessWidget {
   final double scale;
 
-  HeaderWithLogo({required this.scale});
+  const HeaderWithLogo({Key? key, required this.scale}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
