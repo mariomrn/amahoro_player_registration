@@ -539,7 +539,9 @@ class _AddPlayerScreenState extends State<AddPlayerScreen> {
         }
       });
       setState(() {
-        selectedSeason = seasonsDocumentList.length-1;
+        selectedLeague = leagueDocumentList.length-2;
+        docID1 = leagueDocumentList[selectedLeague];
+        selectedSeason = seasonsDocumentList.length-2;
         docID2 = seasonsDocumentList[selectedSeason];
         getTeams(docID1, docID2);
       });
