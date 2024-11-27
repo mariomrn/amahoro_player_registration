@@ -12,8 +12,9 @@ class Player {
   String lastName;
   DateTime birthday;
   String id;
-  // String team;
-  // String validUntil;
+  // TODO ich würde hier auch die informationen zu team etc. hinzufügen oder?
+  //String teamName;
+  //String validUntil;
   String photoURL;
 
   factory Player.fromSnapshot(DocumentSnapshot snapshot, String photoUrl) {
