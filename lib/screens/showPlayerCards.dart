@@ -1,20 +1,13 @@
+import 'dart:async';
 import 'dart:typed_data';
-
 import 'package:amahoro_player_registration/screens/widgets/playerCardWidget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
-
-import 'dart:ui' as ui;
-import 'package:flutter/rendering.dart';
-import 'dart:io';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'dart:html' as html;
-
 import '../models/player.dart';
 import '../models/team.dart';
 
@@ -38,6 +31,7 @@ class _TeamSelectionPageState extends State<TeamSelectionPage> {
   List<PlayerCardWidget> playerCards = [];
   List<ScreenshotController> screenshotControllerList = [];
   var pdf = pw.Document();
+  List<Uint8List> playerCardImages = [];
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +72,6 @@ class _TeamSelectionPageState extends State<TeamSelectionPage> {
               icon: Icon(Icons.download),
               onPressed: () {
                 createPDF();
-                //createPdfWithPlayerCards(playerCards);
               },
             ),
           ],
@@ -89,8 +82,7 @@ class _TeamSelectionPageState extends State<TeamSelectionPage> {
             itemCount: playerCards.length,
             itemBuilder: (context, index) {
               Widget playerCard = Padding(
-                padding: const EdgeInsets.only(
-                    bottom: 10.0), // Fügt Abstand unter jeder Karte hinzu
+                padding: const EdgeInsets.only(bottom: 10.0),
                 child: Screenshot(
                     controller: screenshotControllerList[index],
                     child: playerCards[index]),
@@ -125,230 +117,115 @@ class _TeamSelectionPageState extends State<TeamSelectionPage> {
     setState(() {
       screenshotControllerList.clear();
       playerCards = players.map((player) {
-        // Konvertieren Sie das Player-Objekt in eine Map
         Map<String, dynamic> playerMap = player.toMap();
         ScreenshotController screenshotController = ScreenshotController();
         screenshotControllerList.add(screenshotController);
         return PlayerCardWidget(
           playerData: playerMap,
           teamName: teamName,
+          repaintBoundaryKey: GlobalKey(), // Ensure unique keys
         );
       }).toList();
     });
   }
 
-  /*void exportPlayerCardsAsPDF(List<PlayerCardWidget> playerCardsData) async {
-    final pdf = pw.Document();
-    final cardWidth = 242.0; // Breite in Punkten
-    final cardHeight = 153.0; // Höhe in Punkten
-    final pageMargin = 10.0; // Seitenrand in Punkten
-    final pageFormat = PdfPageFormat.a4; // A4-Format
-
-    // Berechnen, wie viele Karten pro Zeile/Spalte passen
-    int cardsPerRow = (pageFormat.width / (cardWidth + pageMargin)).floor();
-    int cardsPerColumn =
-        (pageFormat.height / (cardHeight + pageMargin)).floor();
-
-    // Erstellen Sie PDF-Seiten und fügen Sie Karten hinzu
-    for (var i = 0;
-        i < playerCardsData.length;
-        i += cardsPerRow * cardsPerColumn) {
-      pdf.addPage(
-        pw.Page(
-          pageFormat: pageFormat,
-          build: (pw.Context context) {
-            return pw.GridView(
-              crossAxisCount: cardsPerRow,
-              childAspectRatio: cardWidth / cardHeight,
-              children: playerCardsData
-                  .skip(i)
-                  .take(cardsPerRow * cardsPerColumn)
-                  .map((cardData) {
-                // Konvertieren Sie das Player-Objekt in eine Map
-                Map<String, dynamic> playerMap = cardData.toMap();
-                return PlayerCardWidget(
-                  playerData: playerMap,
-                  teamName: selectedTeam.name,
-                ); // Ersetzen Sie dies durch Ihre Funktion zur Erstellung der PlayerCard
-              }).toList(),
-            );
-          },
-        ),
-      );
-    }*/
-  /*Future<void> createScreenshots(List<PlayerCardWidget> playerCards) async {
-    for (var card in playerCards) {
-      Uint8List? imageBytes = await card.takeScreenshot();
-      if (imageBytes != null) {
-        // Verarbeiten Sie das Bild, z.B. durch Hinzufügen zu einem PDF oder Speichern
-      }
-    }
-  }
-*/
-  /*Future<void> createPdfWithPlayerCards(
-      List<PlayerCardWidget> playerCards) async {
-    final pdf = pw.Document();
-
-    for (var card in playerCards) {
-      Uint8List? imageBytes = await card.takeScreenshot();
-      if (imageBytes != null) {
-        pdf.addPage(
-          pw.Page(
-            build: (pw.Context context) {
-              return pw.Center(
-                child: pw.Image(pw.MemoryImage(imageBytes)),
-              );
-            },
-          ),
-        );
-      } else {
-        print("Screenshot konnte nicht erstellt werden.");
-      }
-    }
-
-    // Speichern der PDF
-    try {
-      final directory = await getApplicationDocumentsDirectory();
-      final file = File('${directory.path}/player_cards/$selectedTeam.pdf');
-      await file.writeAsBytes(await pdf.save());
-      print("PDF gespeichert in ${file.path}");
-    } catch (e) {
-      print("Fehler beim Speichern der PDF: $e");
-    }
-  }*/
-
   savePDF() async {
     Uint8List pdfInBytes = await pdf.save();
     final blob = html.Blob([pdfInBytes], 'application/pdf');
     final url = html.Url.createObjectUrlFromBlob(blob);
-    html.AnchorElement anchorElement = html.AnchorElement(href: url);
-    anchorElement.download = url;
+    final anchorElement = html.AnchorElement(href: url);
+    anchorElement.download = 'player_cards.pdf';
     anchorElement.click();
+    html.Url.revokeObjectUrl(url); // Clean up the URL object
   }
 
-  List<Uint8List> playerCardImages = [];
-  capturePlayerCards() async {
+  Future<void> capturePlayerCardsOffScreen(BuildContext context) async {
     playerCardImages.clear();
-    for (ScreenshotController screenshotController
-        in screenshotControllerList) {
-      await screenshotController
-          .capture()
-          .then((value) => playerCardImages.add(value!));
+    for (var i = 0; i < playerCards.length; i++) {
+      Uint8List? capturedImage =
+          await renderAndCapture(context, playerCards[i]);
+      if (capturedImage != null) {
+        playerCardImages.add(capturedImage);
+      } else {
+        print('Failed to capture screenshot for a player card');
+      }
     }
-    print('Wir sind hier: length ' + playerCardImages.length.toString());
-    print('Wir sind hier: screenshotlength ' +
-        screenshotControllerList.length.toString());
+  }
 
-    return playerCardImages;
+  Future<Uint8List?> renderAndCapture(
+      BuildContext context, Widget widget) async {
+    final screenshotController = ScreenshotController();
+    final completer = Completer<Uint8List?>();
+
+    OverlayEntry overlayEntry = OverlayEntry(
+      builder: (context) => Material(
+        type: MaterialType.transparency,
+        child: Center(
+          child: Screenshot(
+            controller: screenshotController,
+            child: widget,
+          ),
+        ),
+      ),
+    );
+
+    Overlay.of(context)!.insert(overlayEntry);
+
+    Future.delayed(Duration(milliseconds: 100), () async {
+      try {
+        Uint8List? image = await screenshotController.capture();
+        completer.complete(image);
+      } catch (e) {
+        completer.completeError(e);
+      } finally {
+        overlayEntry.remove();
+      }
+    });
+
+    return completer.future;
   }
 
   createPDF() async {
-    //final pdf = pw.Document();
-    const cardWidth = 242.0; // Breite in Punkten
-    const cardHeight = 153.0; // Höhe in Punkten
-    const pageMargin = 10.0; // Seitenrand in Punkten
+    const cardWidth = 243.78; // Breite in Punkten (8.6 cm)
+    const cardHeight = 153.07; // Höhe in Punkten (5.4 cm)
+    const pageMargin = 5.0; // Seitenrand in Punkten
     const pageFormat = PdfPageFormat.a4; // A4-Format
 
-    // Berechnen, wie viele Karten pro Zeile/Spalte passen
     int cardsPerRow = (pageFormat.width / (cardWidth + pageMargin)).floor();
     int cardsPerColumn =
         (pageFormat.height / (cardHeight + pageMargin)).floor();
+
     pdf = pw.Document();
-    //capturePlayerCards macht die ganzen widgets und speichert sie in playerCardImages
-    await capturePlayerCards().then(
-      (capturedImage) {
-        /*for (var i = 0; i < playerCardImages.length / 5.ceil(); i++) {
-          List<Uint8List> tenImages = [];
-          for (var k = 0; k < 5; k++) {
-            if (playerCardImages.length > k + 5 * i) {
-              tenImages.add(playerCardImages[k + 5 * i]);
-            }
-          }
-          //new
-          //10 persos passen auf eine seite
-          pdf.addPage(
-            pw.Page(
-              pageFormat: PdfPageFormat.a4,
-              build: (context) {
-                return pw.Column(
-                  children: buildRows(tenImages),
-                );
-              },
-            ),*/
 
-        // Erstellen Sie PDF-Seiten und fügen Sie Karten hinzu
-        for (var i = 0;
-            i < playerCardImages.length;
-            i += cardsPerRow * cardsPerColumn) {
-          pdf.addPage(pw.Page(
-            pageFormat: pageFormat,
-            build: (pw.Context context) {
-              return pw.GridView(
-                crossAxisCount: cardsPerRow,
-                childAspectRatio: cardWidth / cardHeight,
-                children: playerCardImages
-                    .skip(i)
-                    .take(cardsPerRow * cardsPerColumn)
-                    .map((imageData) => pw.Image(pw.MemoryImage(imageData)))
-                    .toList(),
-              );
-            },
-          ));
-        }
-      },
-    ).then((value) => savePDF());
-  }
+    await capturePlayerCardsOffScreen(
+        context); // Ensure all widgets are rendered off-screen
 
-  List<pw.Row> buildRows(List<Uint8List> tenImages) {
-    List<pw.Row> playercardRows = [];
-    List<Uint8List> playerCardtemp = [];
-    // über die playerCardImages wird iteriert
-    for (var playerCardImage in tenImages) {
-      // der temp liste wird ein playercard geaddet
-      playerCardtemp.add(playerCardImage);
-      // player card temp macht zwei spalten
-      if (true) {
-        playercardRows.add(
-          pw.Row(
-            children: [
-              for (var playercardimage in playerCardtemp)
-                pw.Center(
-                  child: pw.Container(
-                    width: 242,
-                    height: 153,
-                    child: pw.Image(
-                      pw.MemoryImage(playercardimage),
-                      fit: pw.BoxFit.contain,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        );
-        playerCardtemp.clear();
-      }
+    for (var i = 0;
+        i < playerCardImages.length;
+        i += cardsPerRow * cardsPerColumn) {
+      pdf.addPage(pw.Page(
+        pageFormat: pageFormat,
+        margin: pw.EdgeInsets.zero,
+        build: (pw.Context context) {
+          return pw.GridView(
+            crossAxisCount: cardsPerRow,
+            //childAspectRatio: cardWidth / cardHeight,
+            children: playerCardImages
+                .skip(i)
+                .take(cardsPerRow * cardsPerColumn)
+                .map((imageData) => pw.Image(
+                      pw.MemoryImage(imageData),
+                      width: cardWidth + 60,
+                      height: cardHeight,
+                      fit: pw.BoxFit.fitWidth,
+                    )) // Set image size
+                .toList(),
+          );
+        },
+      ));
     }
-    if (false) {
-      playercardRows.add(
-        pw.Row(
-          children: [
-            for (var playercardimage in playerCardtemp)
-              pw.Center(
-                child: pw.Container(
-                  width: 400,
-                  height: 400,
-                  child: pw.Image(
-                    pw.MemoryImage(playercardimage),
-                    fit: pw.BoxFit.contain,
-                  ),
-                ),
-              ),
-          ],
-        ),
-      );
-      playerCardtemp.clear();
-    }
-    return playercardRows;
+
+    savePDF();
   }
 }
 
